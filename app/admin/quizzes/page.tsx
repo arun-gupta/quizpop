@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import QuizForm from '@/components/admin/QuizForm'
+import MarkdownImport from '@/components/admin/MarkdownImport'
 import type { QuizWithQuestions } from '@/types/database'
 
 interface QuizSummary {
@@ -27,6 +28,7 @@ export default function QuizzesPage() {
   const [editingQuiz, setEditingQuiz] = useState<QuizWithQuestions | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
+  const [showImport, setShowImport] = useState(false)
 
   async function fetchQuizzes() {
     setLoading(true)
@@ -128,15 +130,26 @@ export default function QuizzesPage() {
           <h1 className="text-2xl font-bold text-white">Quizzes</h1>
           <p className="mt-1 text-gray-400 text-sm">Create and manage your quiz library</p>
         </div>
-        <button
-          onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Create Quiz
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowImport(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors border border-gray-600"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Import .md
+          </button>
+          <button
+            onClick={() => setShowCreate(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Create Quiz
+          </button>
+        </div>
       </div>
 
       {/* Quiz grid */}
@@ -207,6 +220,35 @@ export default function QuizzesPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Markdown Import modal */}
+      {showImport && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/70 overflow-y-auto py-8 px-4">
+          <div className="w-full max-w-2xl bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+              <div>
+                <h2 className="text-lg font-semibold text-white">Import Quiz from Markdown</h2>
+                <p className="text-xs text-gray-400 mt-0.5">Paste or upload a .md file to create a quiz</p>
+              </div>
+              <button onClick={() => setShowImport(false)} className="text-gray-400 hover:text-white transition-colors">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <MarkdownImport
+                onSuccess={(_quizId, title) => {
+                  setShowImport(false)
+                  fetchQuizzes()
+                  alert(`"${title}" imported successfully!`)
+                }}
+                onCancel={() => setShowImport(false)}
+              />
+            </div>
+          </div>
         </div>
       )}
 
