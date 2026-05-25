@@ -131,6 +131,28 @@ jobs:
             fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
           "
 
+      # Deploy custom perf dashboard to gh-pages (replaces benchmark-action default page)
+      - name: Deploy custom perf dashboard
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stash the HTML from the main checkout before switching branches
+          cp scripts/perf-report.html /tmp/perf-report.html
+
+          git fetch origin gh-pages
+          git checkout gh-pages
+
+          mkdir -p dev/bench
+          cp /tmp/perf-report.html dev/bench/index.html
+
+          git add dev/bench/index.html
+          # Only commit if there are changes (file may be identical across runs)
+          git diff --cached --quiet || git commit -m "chore: update perf dashboard [skip ci]"
+          git push origin gh-pages
+
+          git checkout -
+
       # Keep raw JSON as a downloadable artifact for 90 days
       - name: Upload result artifacts
         if: always()
