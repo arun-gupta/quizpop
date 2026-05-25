@@ -10,7 +10,8 @@
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "import-quiz": "tsx scripts/import-quiz.ts",
-    "setup-admin": "tsx --env-file=.env.local scripts/setup-admin.ts"
+    "setup-admin": "tsx --env-file=.env.local scripts/setup-admin.ts",
+    "load-test": "tsx --env-file=.env.local scripts/load-test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
