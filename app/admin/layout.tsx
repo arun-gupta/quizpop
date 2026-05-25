@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import AdminLogoutButton from '@/components/admin/AdminLogoutButton'
@@ -54,9 +53,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Middleware handles the redirect, but double-check here for safety
+  // No user = render children only (login page, middleware already redirects
+  // all other /admin/* to /admin/login so they never reach here unauthenticated)
   if (!user) {
-    redirect('/admin/login')
+    return <>{children}</>
   }
 
   return (
