@@ -1,0 +1,107 @@
+name: Performance
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:   # allow manual runs from Actions tab
+
+jobs:
+  load-test:
+    name: Load Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # needed to push benchmark history to gh-pages
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Wait for Vercel to finish deploying the commit we just pushed
+      - name: Wait for Vercel deployment
+        run: sleep 30
+
+      - name: Load test — 50 players
+        run: |
+          npm run load-test -- \
+            --players=50 \
+            --url=${{ vars.PRODUCTION_URL }} \
+            --out=results-50.json \
+            --benchmark-out=bench-50.json
+
+      - name: Load test — 100 players
+        run: |
+          npm run load-test -- \
+            --players=100 \
+            --url=${{ vars.PRODUCTION_URL }} \
+            --out=results-100.json \
+            --benchmark-out=bench-100.json
+
+      # Merge both benchmark files into one for the chart
+      - name: Merge benchmark data
+        run: |
+          node -e "
+            const a = require('./bench-50.json');
+            const b = require('./bench-100.json');
+            require('fs').writeFileSync('benchmark.json', JSON.stringify([...a, ...b], null, 2));
+          "
+
+      # Append to gh-pages branch — auto-creates the branch & chart page
+      - name: Store benchmark history + generate trend chart
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: QuizPop API Latency
+          tool: customSmallerIsBetter
+          output-file-path: benchmark.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          comment-on-alert: true
+          alert-threshold: '150%'
+          fail-on-alert: false
+          benchmark-data-dir-path: dev/bench
+
+      # Write a human-readable summary in the Actions run
+      - name: Write job summary
+        if: always()
+        run: |
+          node -e "
+            const fs = require('fs');
+            const r50  = JSON.parse(fs.readFileSync('results-50.json',  'utf8'));
+            const r100 = JSON.parse(fs.readFileSync('results-100.json', 'utf8'));
+            const fmt = n => n.toFixed(0) + 'ms';
+            const rows = [r50, r100].map(r =>
+              '| ' + [
+                r.players,
+                r.join.passed + '/' + r.join.total,
+                fmt(r.join.p50),  fmt(r.join.p95),
+                r.answer.passed + '/' + r.answer.total,
+                fmt(r.answer.p50), fmt(r.answer.p95),
+                r.autoReveal ? '✅' : '❌',
+                r.pass ? '✅ PASS' : '❌ FAIL',
+              ].join(' | ') + ' |'
+            ).join('\n');
+            const md = [
+              '## 🚀 Performance Results',
+              '',
+              '| Players | Join OK | Join p50 | Join p95 | Answer OK | Answer p50 | Answer p95 | Auto-reveal | Status |',
+              '|---------|---------|----------|----------|-----------|------------|------------|-------------|--------|',
+              rows,
+              '',
+              '> Trend chart: https://\${{ github.repository_owner }}.github.io/\${{ github.event.repository.name }}/dev/bench/',
+            ].join('\n');
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, md);
+          "
+
+      # Keep raw JSON as a downloadable artifact for 90 days
+      - name: Upload result artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-results-${{ github.sha }}
+          path: results-*.json
+          retention-days: 90

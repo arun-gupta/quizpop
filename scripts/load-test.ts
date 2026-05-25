@@ -2,11 +2,13 @@
  * Load test: simulates N concurrent players joining and answering a game.
  *
  * Usage:
- *   npm run load-test                          # 50 players, localhost
- *   npm run load-test -- --players=100         # 100 players
- *   npm run load-test -- --url=https://...     # against production
- *   npm run load-test -- --players=50 --url=https://quizpop-arungupta.vercel.app
+ *   npm run load-test                                   # 50 players, localhost
+ *   npm run load-test -- --players=100                  # 100 players
+ *   npm run load-test -- --url=https://...              # against production
+ *   npm run load-test -- --players=50 --out=results.json  # save JSON output
  */
+
+import { writeFileSync } from 'fs'
 
 const args = Object.fromEntries(
   process.argv.slice(2).map(a => a.replace(/^--/, '').split('=') as [string, string])
@@ -14,6 +16,8 @@ const args = Object.fromEntries(
 
 const BASE_URL = args.url ?? 'http://localhost:3000'
 const PLAYER_COUNT = parseInt(args.players ?? '50', 10)
+const OUT_FILE = args.out ?? null             // e.g. --out=results.json
+const BENCHMARK_OUT = args['benchmark-out'] ?? null  // github-action-benchmark format
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -228,11 +232,42 @@ async function main() {
   const revealed = gameState === 'question_results' || gameState === 'leaderboard' || gameState === 'finished'
   console.log(`game_state = ${gameState} ${revealed ? '✓ auto-revealed' : '✗ still question_active'}`)
 
+  const joinStats = stats(joinResults.filter(r => r.ok).map(r => r.ms))
+  const answerStats = stats(answerResults.filter(r => r.ok).map(r => r.ms))
+  const pass = joinResults.every(r => r.ok) && answerResults.filter(r => r.ok).length >= joined * 0.95
+
+  const result = {
+    timestamp: new Date().toISOString(),
+    url: BASE_URL,
+    players: PLAYER_COUNT,
+    join: { total: joinResults.length, passed: joinResults.filter(r => r.ok).length, failed: joinResults.filter(r => !r.ok).length, ...joinStats },
+    answer: { total: answerResults.length, passed: answerResults.filter(r => r.ok).length, failed: answerResults.filter(r => !r.ok).length, ...answerStats },
+    autoReveal: revealed,
+    pass,
+  }
+
+  if (OUT_FILE) {
+    writeFileSync(OUT_FILE, JSON.stringify(result, null, 2))
+    console.log(`\n  Results saved to ${OUT_FILE}`)
+  }
+
+  // github-action-benchmark format (customSmallerIsBetter)
+  if (BENCHMARK_OUT) {
+    const n = PLAYER_COUNT
+    const bench = [
+      { name: `join_p50 (${n} players)`,   unit: 'ms', value: Math.round(joinStats.p50) },
+      { name: `join_p95 (${n} players)`,   unit: 'ms', value: Math.round(joinStats.p95) },
+      { name: `answer_p50 (${n} players)`, unit: 'ms', value: Math.round(answerStats.p50) },
+      { name: `answer_p95 (${n} players)`, unit: 'ms', value: Math.round(answerStats.p95) },
+    ]
+    writeFileSync(BENCHMARK_OUT, JSON.stringify(bench, null, 2))
+    console.log(`  Benchmark saved to ${BENCHMARK_OUT}`)
+  }
+
   console.log('\n─────────────────────────────')
-  console.log(joinResults.every(r => r.ok) && answerResults.filter(r => r.ok).length >= joined * 0.95
-    ? '✓ PASS — all key metrics within threshold'
-    : '✗ FAIL — check errors above')
+  console.log(pass ? '✓ PASS — all key metrics within threshold' : '✗ FAIL — check errors above')
   console.log('')
+  if (!pass) process.exit(1)
 }
 
 main().catch(err => {
