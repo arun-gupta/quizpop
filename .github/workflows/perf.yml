@@ -22,9 +22,33 @@ jobs:
 
       - run: npm ci
 
-      # Wait for Vercel to finish deploying the commit we just pushed
+      # Poll Vercel API until the deployment for this exact commit is READY
       - name: Wait for Vercel deployment
-        run: sleep 30
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_APP: quizpop
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          echo "Waiting for Vercel to deploy $COMMIT_SHA..."
+          for i in $(seq 1 30); do
+            STATE=$(curl -sf \
+              "https://api.vercel.com/v6/deployments?app=$VERCEL_APP&limit=5&target=production" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" \
+              | jq -r ".deployments[] | select(.meta.githubCommitSha == \"$COMMIT_SHA\") | .readyState" \
+              | head -1)
+            echo "  attempt $i/30: readyState=${STATE:-not_found}"
+            if [ "$STATE" = "READY" ]; then
+              echo "Deployment ready ✓"
+              exit 0
+            fi
+            if [ "$STATE" = "ERROR" ] || [ "$STATE" = "CANCELED" ]; then
+              echo "Deployment failed with state: $STATE"
+              exit 1
+            fi
+            sleep 10
+          done
+          echo "Timed out waiting for deployment (5 min)"
+          exit 1
 
       - name: Load test — 50 players
         run: |
