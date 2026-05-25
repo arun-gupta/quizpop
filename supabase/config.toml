@@ -1,6 +1,6 @@
 # Supabase project configuration.
 # Find your project_id in: Supabase Dashboard → Settings → General → Reference ID
-project_id = "your-project-ref"
+project_id = "QuiozPop"
 
 [api]
 enabled = true
