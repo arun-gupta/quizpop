@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type {
@@ -31,6 +31,7 @@ export default function HostGamePage() {
   const [error, setError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
   const [totalQuestions, setTotalQuestions] = useState(0)
+  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false)
 
   // Track current question id to reset response counts properly
   const currentQuestionIdRef = useRef<string | null>(null)
@@ -207,6 +208,10 @@ export default function HostGamePage() {
   const handleReveal = useCallback(() => callHostAction('next', { action: 'reveal' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
   const handleShowLeaderboard = useCallback(() => callHostAction('next', { action: 'leaderboard' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
   const handleNextQuestion = useCallback(() => callHostAction('next', { action: 'next' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
+  const handleFinishGame = useCallback(() => {
+    setShowEndGameConfirm(false)
+    callHostAction('next', { action: 'finish' })
+  }, [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Timer expiry auto-reveal: when the question timer runs out, reveal automatically
   useEffect(() => {
@@ -271,9 +276,10 @@ export default function HostGamePage() {
     ? session.current_question_index >= totalQuestions - 1
     : false
 
+  let content: React.ReactNode = null
   switch (session.game_state) {
     case 'lobby':
-      return (
+      content = (
         <HostLobby
           session={session}
           players={players}
@@ -281,10 +287,10 @@ export default function HostGamePage() {
           isStarting={isActionPending}
         />
       )
+      break
 
     case 'question_active':
-      if (!question) return null
-      return (
+      if (question) content = (
         <HostQuestion
           question={question}
           players={players}
@@ -294,10 +300,10 @@ export default function HostGamePage() {
           questionStartedAt={session.question_started_at}
         />
       )
+      break
 
     case 'question_results':
-      if (!question) return null
-      return (
+      if (question) content = (
         <HostResults
           question={question}
           correctAnswerId={session.correct_answer_id ?? ''}
@@ -306,9 +312,10 @@ export default function HostGamePage() {
           onLeaderboard={handleShowLeaderboard}
         />
       )
+      break
 
     case 'leaderboard':
-      return (
+      content = (
         <HostLeaderboard
           entries={leaderboard}
           onNext={handleNextQuestion}
@@ -316,16 +323,56 @@ export default function HostGamePage() {
           isAdvancing={isActionPending}
         />
       )
+      break
 
     case 'finished':
-      return (
+      content = (
         <HostFinished
           entries={leaderboard}
           session={session}
         />
       )
-
-    default:
-      return null
+      break
   }
+
+  const canEndGame = session.game_state !== 'finished'
+
+  return (
+    <>
+      {content}
+
+      {/* End Game overlay — visible in all non-finished states */}
+      {canEndGame && (
+        <div className="fixed top-4 left-4 z-50">
+          {showEndGameConfirm ? (
+            <div className="bg-gray-900/95 backdrop-blur-sm border border-red-500/40 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 min-w-[220px]">
+              <p className="text-white font-bold text-sm text-center">End the game for everyone?</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowEndGameConfirm(false)}
+                  className="flex-1 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleFinishGame}
+                  disabled={isActionPending}
+                  className="flex-1 px-3 py-2 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-bold transition-colors"
+                >
+                  {isActionPending ? '...' : 'End Game'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowEndGameConfirm(true)}
+              className="px-4 py-2 rounded-xl bg-gray-900/80 hover:bg-red-900/80 border border-white/20 hover:border-red-500/60 text-white/60 hover:text-white text-sm font-bold backdrop-blur-sm transition-all duration-200 shadow-lg"
+            >
+              ✕ End Game
+            </button>
+          )}
+        </div>
+      )}
+    </>
+  )
 }
