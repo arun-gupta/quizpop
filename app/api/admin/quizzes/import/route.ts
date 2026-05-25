@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
         .insert({
           quiz_id: quiz.id,
           question_text: q.question_text,
+          image_url: q.image_url ?? null,
           timer_seconds: q.timer_seconds,
           points: q.points,
           display_order: q.display_order,

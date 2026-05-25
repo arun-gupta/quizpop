@@ -31,6 +31,8 @@ Optional one-line description.
 | Wrong answer | `- [ ] Answer text` | 1–3 per question (2–4 total) |
 | Timer override | `> timer: 15` | After question line, seconds (default: 20) |
 | Points override | `> points: 500` | After question line (default: 1000) |
+| Image | `> image: https://...` | After question line, public image URL |
+| Image (alt) | `![alt](https://...)` | Standard Markdown image syntax |
 
 ## Custom Timer and Points
 
@@ -79,6 +81,7 @@ Fun questions for the whole family!
 - [ ] 4
 
 ## Which planet is known as the Red Planet?
+> image: https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/240px-OSIRIS_Mars_true_color.jpg
 - [ ] Jupiter
 - [ ] Venus
 - [x] Mars

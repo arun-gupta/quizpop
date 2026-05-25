@@ -8,6 +8,7 @@ export interface ParsedQuiz {
 
 export interface ParsedQuestion {
   question_text: string
+  image_url?: string
   timer_seconds: number
   points: number
   display_order: number
@@ -81,6 +82,7 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
       flushQuestion()
       currentQuestion = {
         question_text: line.slice(3).trim(),
+        image_url: undefined,
         timer_seconds: DEFAULT_TIMER,
         points: DEFAULT_POINTS,
         display_order: 0,
@@ -91,13 +93,22 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
 
     if (!currentQuestion) continue
 
-    // Optional metadata line: > timer: 20 | points: 1000
+    // Optional metadata line: > timer: 20 | points: 1000 | image: https://...
     if (line.startsWith('> ')) {
       const meta = line.slice(2)
       const timerMatch = meta.match(/timer:\s*(\d+)/i)
       const pointsMatch = meta.match(/points:\s*(\d+)/i)
+      const imageMatch = meta.match(/image:\s*(https?:\/\/\S+)/i)
       if (timerMatch) currentQuestion.timer_seconds = parseInt(timerMatch[1], 10)
       if (pointsMatch) currentQuestion.points = parseInt(pointsMatch[1], 10)
+      if (imageMatch) currentQuestion.image_url = imageMatch[1].trim()
+      continue
+    }
+
+    // Standalone image line: ![alt](url) or just a bare https:// image URL line
+    const mdImageMatch = line.match(/^!\[.*?\]\((https?:\/\/\S+)\)$/)
+    if (mdImageMatch) {
+      currentQuestion.image_url = mdImageMatch[1]
       continue
     }
 
@@ -189,6 +200,7 @@ Fun questions for all ages — perfect for parties!
 - [ ] 4
 
 ## Which planet is known as the Red Planet?
+> image: https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/240px-OSIRIS_Mars_true_color.jpg
 - [ ] Jupiter
 - [ ] Venus
 - [x] Mars
