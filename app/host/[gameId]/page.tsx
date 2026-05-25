@@ -240,7 +240,7 @@ export default function HostGamePage() {
     return () => clearTimeout(timeout)
   }, [session?.game_state, session?.question_started_at, question?.id, question?.timer_seconds, gameId, fetchGameState])
 
-  // Auto-advance to leaderboard 5 s after question results are shown
+  // Auto-advance to leaderboard 5s after question results are shown
   useEffect(() => {
     if (session?.game_state !== 'question_results') return
     const timeout = setTimeout(() => {
@@ -252,6 +252,21 @@ export default function HostGamePage() {
         .then(() => fetchGameState())
         .catch(() => {})
     }, 5000)
+    return () => clearTimeout(timeout)
+  }, [session?.game_state, gameId, fetchGameState])
+
+  // Auto-advance from leaderboard to next question (or finished) after 8s
+  useEffect(() => {
+    if (session?.game_state !== 'leaderboard') return
+    const timeout = setTimeout(() => {
+      fetch(`/api/game/${gameId}/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hostToken: hostTokenRef.current, action: 'next' }),
+      })
+        .then(() => fetchGameState())
+        .catch(() => {})
+    }, 8000)
     return () => clearTimeout(timeout)
   }, [session?.game_state, gameId, fetchGameState])
 
@@ -337,6 +352,7 @@ export default function HostGamePage() {
           onNext={handleNextQuestion}
           isLastQuestion={isLastQuestion}
           isAdvancing={isActionPending}
+          autoAdvanceSecs={8}
         />
       )
       break

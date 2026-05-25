@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { LeaderboardEntry } from '@/types/database'
 import Leaderboard from '@/components/game/Leaderboard'
 
@@ -8,6 +9,7 @@ interface HostLeaderboardProps {
   onNext: () => void
   isLastQuestion: boolean
   isAdvancing: boolean
+  autoAdvanceSecs?: number
 }
 
 export default function HostLeaderboard({
@@ -15,7 +17,17 @@ export default function HostLeaderboard({
   onNext,
   isLastQuestion,
   isAdvancing,
+  autoAdvanceSecs = 8,
 }: HostLeaderboardProps) {
+  const [countdown, setCountdown] = useState(autoAdvanceSecs)
+
+  useEffect(() => {
+    setCountdown(autoAdvanceSecs)
+    const interval = setInterval(() => {
+      setCountdown(prev => Math.max(0, prev - 1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [autoAdvanceSecs])
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       {/* Header */}
@@ -40,8 +52,8 @@ export default function HostLeaderboard({
         )}
       </div>
 
-      {/* Next button */}
-      <div className="px-8 py-8 flex justify-center">
+      {/* Next button + countdown */}
+      <div className="px-8 py-8 flex flex-col items-center gap-3">
         <button
           onClick={onNext}
           disabled={isAdvancing}
@@ -69,6 +81,9 @@ export default function HostLeaderboard({
             '▶ Next Question'
           )}
         </button>
+        <p className="text-white/40 text-sm font-semibold">
+          Auto-advancing in {countdown}s…
+        </p>
       </div>
 
       <style jsx>{`
