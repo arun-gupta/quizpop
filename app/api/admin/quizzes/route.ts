@@ -2,15 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 
 // ─── GET /api/admin/quizzes ─────────────────────────────────────────────────
-// List all quizzes with question counts
+// List all quizzes with question counts — public read, no auth required
 export async function GET() {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const service = createServiceClient()
 
     const { data: quizzes, error } = await service
