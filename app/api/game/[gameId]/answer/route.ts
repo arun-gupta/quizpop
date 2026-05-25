@@ -189,7 +189,46 @@ export async function POST(
       if (error) console.warn('Analytics event failed:', error.message)
     })
 
-    // Do NOT reveal the correct answer yet — that happens on 'reveal' action
+    // Auto-reveal when all players have answered
+    const { data: sessionPlayers } = await supabase
+      .from('players')
+      .select('id')
+      .eq('game_session_id', gameId)
+
+    const playerIds = (sessionPlayers ?? []).map(p => p.id)
+    const playerCount = playerIds.length
+
+    const { count: responseCount } = playerCount > 0
+      ? await supabase
+          .from('player_responses')
+          .select('id', { count: 'exact', head: true })
+          .eq('question_id', currentQuestion.id)
+          .in('player_id', playerIds)
+      : { count: 0 }
+
+    if (
+      typeof responseCount === 'number' &&
+      typeof playerCount === 'number' &&
+      playerCount > 0 &&
+      responseCount >= playerCount
+    ) {
+      // All players answered — reveal the correct answer automatically
+      const { data: correctOption } = await supabase
+        .from('answer_options')
+        .select('id')
+        .eq('question_id', currentQuestion.id)
+        .eq('is_correct', true)
+        .single()
+
+      if (correctOption) {
+        await supabase
+          .from('game_sessions')
+          .update({ game_state: 'question_results', correct_answer_id: correctOption.id })
+          .eq('id', gameId)
+          .eq('game_state', 'question_active') // guard against race conditions
+      }
+    }
+
     return NextResponse.json({
       isCorrect,
       awardedPoints,

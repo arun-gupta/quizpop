@@ -34,6 +34,11 @@ export default function HostGamePage() {
 
   // Track current question id to reset response counts properly
   const currentQuestionIdRef = useRef<string | null>(null)
+  // Stable ref so timer callbacks always use the latest hostToken
+  const hostTokenRef = useRef(hostToken)
+
+  // Keep ref in sync so timer callbacks always see the latest value
+  hostTokenRef.current = hostToken
 
   // Load host token from localStorage
   useEffect(() => {
@@ -177,14 +182,14 @@ export default function HostGamePage() {
 
   // -------- Action helpers (call API then refresh state) --------
 
-  async function callHostAction(path: string) {
+  async function callHostAction(path: string, extraBody: Record<string, unknown> = {}) {
     if (isActionPending || !hostToken) return
     setIsActionPending(true)
     try {
       const res = await fetch(`/api/game/${gameId}/${path}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hostToken }),
+        body: JSON.stringify({ hostToken, ...extraBody }),
       })
       if (!res.ok) {
         const data = await res.json()
@@ -199,7 +204,36 @@ export default function HostGamePage() {
   }
 
   const handleStart = useCallback(() => callHostAction('start'), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
-  const handleNext = useCallback(() => callHostAction('next'), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
+  const handleReveal = useCallback(() => callHostAction('next', { action: 'reveal' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
+  const handleShowLeaderboard = useCallback(() => callHostAction('next', { action: 'leaderboard' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
+  const handleNextQuestion = useCallback(() => callHostAction('next', { action: 'next' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Timer expiry auto-reveal: when the question timer runs out, reveal automatically
+  useEffect(() => {
+    if (session?.game_state !== 'question_active' || !session.question_started_at || !question?.timer_seconds) return
+
+    const startedAt = new Date(session.question_started_at).getTime()
+    const timeLimitMs = question.timer_seconds * 1000
+    const remaining = timeLimitMs - (Date.now() - startedAt)
+
+    const triggerReveal = () => {
+      fetch(`/api/game/${gameId}/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hostToken: hostTokenRef.current, action: 'reveal' }),
+      })
+        .then(() => fetchGameState())
+        .catch(() => {})
+    }
+
+    if (remaining <= 0) {
+      triggerReveal()
+      return
+    }
+
+    const timeout = setTimeout(triggerReveal, remaining)
+    return () => clearTimeout(timeout)
+  }, [session?.game_state, session?.question_started_at, question?.id, question?.timer_seconds, gameId, fetchGameState])
 
   // -------- Render --------
 
@@ -255,7 +289,7 @@ export default function HostGamePage() {
           question={question}
           players={players}
           responses={responseCount}
-          onReveal={handleNext}
+          onReveal={handleReveal}
           isRevealing={isActionPending}
           questionStartedAt={session.question_started_at}
         />
@@ -269,7 +303,7 @@ export default function HostGamePage() {
           correctAnswerId={session.correct_answer_id ?? ''}
           players={players}
           answerDistribution={answerDistribution}
-          onLeaderboard={handleNext}
+          onLeaderboard={handleShowLeaderboard}
         />
       )
 
@@ -277,7 +311,7 @@ export default function HostGamePage() {
       return (
         <HostLeaderboard
           entries={leaderboard}
-          onNext={handleNext}
+          onNext={handleNextQuestion}
           isLastQuestion={isLastQuestion}
           isAdvancing={isActionPending}
         />
