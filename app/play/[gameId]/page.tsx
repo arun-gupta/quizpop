@@ -222,6 +222,12 @@ interface PlayerResultsProps {
 }
 
 function PlayerResults({ question, player, selectedAnswerId, correctAnswerId, lastResponse }: PlayerResultsProps) {
+  const [countdown, setCountdown] = useState(5)
+  useEffect(() => {
+    const interval = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   const isCorrect = selectedAnswerId && correctAnswerId && selectedAnswerId === correctAnswerId
   const correctOption = question.answer_options.find(o => o.id === correctAnswerId)
 
@@ -267,7 +273,10 @@ function PlayerResults({ question, player, selectedAnswerId, correctAnswerId, la
           <p className="text-purple-400 text-xs">pts</p>
         </div>
 
-        <WaitingSpinner message="Waiting for leaderboard..." />
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-purple-300/70 text-sm font-semibold">Leaderboard in</p>
+          <p className="text-4xl font-black text-white">{countdown}</p>
+        </div>
       </div>
     </div>
   )
@@ -279,6 +288,12 @@ interface PlayerLeaderboardProps {
 }
 
 function PlayerLeaderboard({ leaderboard, player }: PlayerLeaderboardProps) {
+  const [countdown, setCountdown] = useState(8)
+  useEffect(() => {
+    const interval = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   const myEntry = leaderboard.find(e => e.player_id === player.id)
   const top5 = leaderboard.slice(0, 5)
 
@@ -339,7 +354,10 @@ function PlayerLeaderboard({ leaderboard, player }: PlayerLeaderboardProps) {
           })}
         </div>
 
-        <WaitingSpinner message="Next question coming up..." />
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-purple-300/70 text-sm font-semibold">Next question in</p>
+          <p className="text-4xl font-black text-white">{countdown}</p>
+        </div>
       </div>
     </div>
   )

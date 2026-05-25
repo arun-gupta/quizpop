@@ -86,9 +86,16 @@ export async function GET(
           return NextResponse.json({ error: 'Failed to fetch answer options' }, { status: 500 })
         }
 
+        // Shuffle so the correct answer isn't always in the same position
+        const shuffled = [...(answerOptions ?? [])]
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+        }
+
         question = {
           ...currentQuestion,
-          answer_options: answerOptions ?? [],
+          answer_options: shuffled,
         }
       }
     }
