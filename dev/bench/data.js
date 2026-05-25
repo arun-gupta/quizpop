@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779724368724,
+  "lastUpdate": 1779724916169,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -63,6 +63,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3263,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "206ddc7018013aec14b4357fd2a4d4db1d3a12d1",
+          "message": "Add custom perf dashboard and deploy it to gh-pages on every CI run\n\nCopies scripts/perf-report.html to dev/bench/index.html on the gh-pages\nbranch after benchmark-action writes data.js, replacing the default\nbenchmark-action chart with a branded dark-theme dashboard showing\ntrend summary cards, per-metric line charts (50 + 100 players), and\na full run log with linked commit SHAs.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-25T09:00:42-07:00",
+          "tree_id": "16e289c2f0400a66faeed29bfacc81f1ce421825",
+          "url": "https://github.com/arun-gupta/quizpop/commit/206ddc7018013aec14b4357fd2a4d4db1d3a12d1"
+        },
+        "date": 1779724915289,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1677,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 1933,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 2297,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2727,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1706,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1914,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2348,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3042,
             "unit": "ms"
           }
         ]
