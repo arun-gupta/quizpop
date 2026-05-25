@@ -15,14 +15,6 @@ export async function POST(req: NextRequest) {
     if (!joinCode || typeof joinCode !== 'string') {
       return NextResponse.json({ error: 'joinCode required' }, { status: 400 })
     }
-    if (!displayName || typeof displayName !== 'string') {
-      return NextResponse.json({ error: 'displayName required' }, { status: 400 })
-    }
-
-    const sanitized = sanitizeDisplayName(displayName)
-    if (!sanitized || sanitized.length === 0) {
-      return NextResponse.json({ error: 'displayName is invalid or empty after sanitization' }, { status: 400 })
-    }
 
     const supabase = createServiceClient()
 
@@ -47,6 +39,20 @@ export async function POST(req: NextRequest) {
         { error: 'Game has already started. You can only join during the lobby.' },
         { status: 409 }
       )
+    }
+
+    // Validation-only request (step 1 of the join flow — just checks the code)
+    if (body.validate === true) {
+      return NextResponse.json({ gameId: session.id, joinCode: session.join_code })
+    }
+
+    if (!displayName || typeof displayName !== 'string') {
+      return NextResponse.json({ error: 'displayName required' }, { status: 400 })
+    }
+
+    const sanitized = sanitizeDisplayName(displayName)
+    if (!sanitized || sanitized.length === 0) {
+      return NextResponse.json({ error: 'displayName is invalid or empty after sanitization' }, { status: 400 })
     }
 
     // Rate limit: check current player count
