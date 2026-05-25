@@ -240,6 +240,21 @@ export default function HostGamePage() {
     return () => clearTimeout(timeout)
   }, [session?.game_state, session?.question_started_at, question?.id, question?.timer_seconds, gameId, fetchGameState])
 
+  // Auto-advance to leaderboard 5 s after question results are shown
+  useEffect(() => {
+    if (session?.game_state !== 'question_results') return
+    const timeout = setTimeout(() => {
+      fetch(`/api/game/${gameId}/next`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hostToken: hostTokenRef.current, action: 'leaderboard' }),
+      })
+        .then(() => fetchGameState())
+        .catch(() => {})
+    }, 5000)
+    return () => clearTimeout(timeout)
+  }, [session?.game_state, gameId, fetchGameState])
+
   // -------- Render --------
 
   if (isLoading) {
@@ -310,6 +325,7 @@ export default function HostGamePage() {
           players={players}
           answerDistribution={answerDistribution}
           onLeaderboard={handleShowLeaderboard}
+          autoAdvanceSecs={5}
         />
       )
       break

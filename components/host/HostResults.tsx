@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { PublicQuestion, Player } from '@/types/database'
 
 const ANSWER_CONFIG = [
@@ -15,6 +16,7 @@ interface HostResultsProps {
   players: Player[]
   answerDistribution: Record<string, number>
   onLeaderboard: () => void
+  autoAdvanceSecs?: number
 }
 
 export default function HostResults({
@@ -23,7 +25,17 @@ export default function HostResults({
   players,
   answerDistribution,
   onLeaderboard,
+  autoAdvanceSecs = 5,
 }: HostResultsProps) {
+  const [countdown, setCountdown] = useState(autoAdvanceSecs)
+
+  useEffect(() => {
+    setCountdown(autoAdvanceSecs)
+    const interval = setInterval(() => {
+      setCountdown(prev => Math.max(0, prev - 1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [autoAdvanceSecs])
   const sortedOptions = [...question.answer_options].sort(
     (a, b) => a.display_order - b.display_order
   )
@@ -123,14 +135,17 @@ export default function HostResults({
         </p>
       </div>
 
-      {/* Show Leaderboard button */}
-      <div className="px-8 pb-8 flex justify-center">
+      {/* Auto-advance countdown + manual button */}
+      <div className="px-8 pb-8 flex flex-col items-center gap-3">
         <button
           onClick={onLeaderboard}
           className="px-12 py-5 rounded-2xl text-white text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-violet-400 hover:from-purple-400 hover:to-violet-300 hover:scale-105 active:scale-95 transition-all duration-200 shadow-2xl cursor-pointer"
         >
           🏆 Show Leaderboard
         </button>
+        <p className="text-white/40 text-sm font-semibold">
+          Auto-advancing in {countdown}s…
+        </p>
       </div>
     </div>
   )
