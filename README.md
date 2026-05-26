@@ -1,16 +1,14 @@
-<p align="center">
-  <img src="public/quizpop-logo.png" width="120" alt="QuizPop logo" />
-</p>
+<div align="center">
+  <img src="public/quizpop-logo.png" width="100" alt="QuizPop logo" />
+  <h1>QuizPop 🎉</h1>
+  <p>Kahoot-style multiplayer quiz game for parties and events — no app download required.</p>
 
-# QuizPop 🎉
-
-> Kahoot-style multiplayer quiz game for parties and events — no app download required.
-
-[![Production](https://img.shields.io/badge/Production-Live-00C7B7?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app)
-[![Vercel](https://img.shields.io/badge/Vercel-Deployments-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/arun-gupta-5985s-projects/quizpop/deployments)
-[![Supabase](https://img.shields.io/badge/Supabase-Dashboard-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/dashboard/project/kttofycsvcjmwpxamjwa)
-[![Perf](https://img.shields.io/badge/Perf-Dashboard-4493F8?style=for-the-badge&logo=githubactions&logoColor=white)](https://arun-gupta.github.io/quizpop/dev/bench/)
-[![Admin](https://img.shields.io/badge/Admin-Panel-7C3AED?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app/admin)
+  [![Production](https://img.shields.io/badge/Production-Live-00C7B7?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app)
+  [![Vercel](https://img.shields.io/badge/Vercel-Deployments-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/arun-gupta-5985s-projects/quizpop/deployments)
+  [![Supabase](https://img.shields.io/badge/Supabase-Dashboard-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/dashboard/project/kttofycsvcjmwpxamjwa)
+  [![Perf](https://img.shields.io/badge/Perf-Dashboard-4493F8?style=for-the-badge&logo=githubactions&logoColor=white)](https://arun-gupta.github.io/quizpop/dev/bench/)
+  [![Admin](https://img.shields.io/badge/Admin-Panel-7C3AED?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app/admin)
+</div>
 
 A host picks a quiz, players join on any device via a 6-letter code or QR code, and everyone answers timed questions for points. Built to run on Vercel + Supabase free tiers with no custom WebSocket server.
 
