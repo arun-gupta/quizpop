@@ -2,6 +2,16 @@
 
 > The fast, fun, multiplayer quiz game for parties and events — no app download required!
 
+## Project links
+
+| | |
+|---|---|
+| 🚀 **Production app** | https://quizpop-arungupta.vercel.app |
+| 🔐 **Admin panel** | https://quizpop-arungupta.vercel.app/admin |
+| ▲ **Vercel deployments** | https://vercel.com/arun-gupta-5985s-projects/quizpop/deployments |
+| 🗄️ **Supabase dashboard** | https://supabase.com/dashboard/project/kttofycsvcjmwpxamjwa |
+| 📈 **Perf dashboard** | https://arun-gupta.github.io/quizpop/dev/bench/ |
+
 QuizPop is a Kahoot-style party quiz game built with Next.js 15 and Supabase Realtime. A host creates a game room, players join with a 6-letter code on any device, and everyone battles for quiz glory in real time.
 
 <!-- Screenshot placeholder -->

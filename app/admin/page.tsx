@@ -163,53 +163,6 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      {/* Quick external links */}
-      <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Quick Links</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            {
-              label: 'Production App',
-              href: 'https://quizpop-arungupta.vercel.app/admin',
-              desc: 'Live admin panel',
-              icon: '🚀',
-            },
-            {
-              label: 'Vercel Deployments',
-              href: 'https://vercel.com/arun-gupta-5985s-projects/quizpop/deployments',
-              desc: 'Deploy history & logs',
-              icon: '▲',
-            },
-            {
-              label: 'Supabase Dashboard',
-              href: 'https://supabase.com/dashboard/project/kttofycsvcjmwpxamjwa',
-              desc: 'Database & auth',
-              icon: '🗄️',
-            },
-            {
-              label: 'Perf Dashboard',
-              href: 'https://arun-gupta.github.io/quizpop/dev/bench/',
-              desc: 'CI load-test trends',
-              icon: '📈',
-            },
-          ].map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 bg-gray-900 border border-gray-800 hover:border-violet-600 rounded-xl px-4 py-3 transition-colors group"
-            >
-              <span className="text-2xl">{link.icon}</span>
-              <div>
-                <p className="text-sm font-semibold text-white group-hover:text-violet-300 transition-colors">{link.label}</p>
-                <p className="text-xs text-gray-500">{link.desc}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-
       {/* Recent Games table */}
       <div>
         <div className="flex items-center justify-between mb-4">
