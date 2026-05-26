@@ -30,7 +30,7 @@ function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined; buc
   if (!url || failed) {
     return (
       <div className="flex justify-center">
-        <div className="h-40 w-full max-w-lg rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 bg-white/5">
+        <div className="w-full max-w-lg rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 bg-white/5" style={{height: 'clamp(80px, 15vh, 160px)'}}>
           <span className="text-4xl">🖼️</span>
           <p className="text-white/40 text-sm font-semibold">{url ? 'Image not found' : 'No bucket configured'}</p>
           <p className="text-white/25 text-xs font-mono">{rawValue}</p>
@@ -43,7 +43,7 @@ function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined; buc
     <div className="flex justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url} alt="Question image" onError={() => setFailed(true)}
-        className="h-40 max-w-lg w-full rounded-2xl object-cover shadow-xl" />
+        className="max-w-lg w-full rounded-2xl object-cover shadow-xl" style={{height: 'clamp(80px, 15vh, 160px)'}} />
     </div>
   )
 }
@@ -212,10 +212,10 @@ export default function PreviewPage() {
             </div>
 
             {/* Dot navigation */}
-            <div className="flex items-center gap-1.5 overflow-x-auto max-w-sm">
+            <div className="flex items-center gap-1 flex-wrap justify-center max-w-xs">
               {quiz.questions.map((q, i) => (
                 <button key={i} onClick={() => goTo(i)}
-                  className={['w-5 h-5 rounded-full text-xs font-bold flex-shrink-0 transition-colors',
+                  className={['w-4 h-4 rounded-full text-[10px] font-bold flex-shrink-0 transition-colors',
                     i === qIndex ? 'bg-purple-400 text-white' : 'bg-white/20 text-white/60 hover:bg-white/30',
                     q.image_url && q.image_reveal === 'after' ? 'ring-1 ring-yellow-400/60' : ''].join(' ')}>
                   {i + 1}

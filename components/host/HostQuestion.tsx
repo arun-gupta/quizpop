@@ -87,7 +87,7 @@ export default function HostQuestion({
         {/* Image — only shown before reveal */}
         {question.image_url && question.image_reveal !== 'after' && (
           <div className="flex justify-center flex-shrink-0">
-            <div className="relative h-40 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
+            <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-xl" style={{height: 'clamp(80px, 15vh, 160px)'}}>
               <Image
                 src={question.image_url}
                 alt="Question image"

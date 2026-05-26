@@ -57,7 +57,7 @@ export default function PlayerResults({
       {/* Reveal image */}
       {question.image_url && question.image_reveal === 'after' && (
         <div className="px-4 pt-3">
-          <div className="relative h-40 w-full rounded-2xl overflow-hidden shadow-lg">
+          <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" style={{height: 'clamp(60px, 12vh, 144px)'}}>
             <Image src={question.image_url} alt="Question image" fill className="object-cover" />
           </div>
         </div>

@@ -61,7 +61,7 @@ export default function HostResults({
       {/* Reveal image — shown only after answer */}
       {question.image_url && question.image_reveal === 'after' && (
         <div className="flex justify-center px-8 pb-2">
-          <div className="relative h-40 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
+          <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-xl" style={{height: 'clamp(80px, 15vh, 160px)'}}>
             <Image src={question.image_url} alt="Question image" fill className="object-cover" />
           </div>
         </div>
