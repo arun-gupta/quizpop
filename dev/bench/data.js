@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779754365766,
+  "lastUpdate": 1779754717061,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -191,6 +191,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 2656,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "3c58503b8302b5b92d9cc99799bf8454042314ee",
+          "message": "Add vercel.json to gh-pages branch to prevent Vercel from building it\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-25T17:17:33-07:00",
+          "tree_id": "5c36a3d3255c9b180b59476f09ec7ebfdecd6c53",
+          "url": "https://github.com/arun-gupta/quizpop/commit/3c58503b8302b5b92d9cc99799bf8454042314ee"
+        },
+        "date": 1779754716353,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1966,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2117,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1632,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2217,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1760,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 2252,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 1895,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3214,
             "unit": "ms"
           }
         ]
