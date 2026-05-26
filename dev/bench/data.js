@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779755069658,
+  "lastUpdate": 1779767149780,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -509,6 +509,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3112,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "319ef6780b14e3a879e3eacc685e614a816e07b5",
+          "message": "fix: add safety migration for missing production columns and improve load test errors\n\nMigration 20250527000004 re-applies ADD COLUMN IF NOT EXISTS for question_type,\nsection_title, section_intro_at, and state_changed_at — production DB was missing\nquestion_type because 20250526000000 was only marked applied via migration repair,\nnever actually executed. Also updates quiz content and surfaces real server errors\nin load test output.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-25T20:40:01-07:00",
+          "tree_id": "20c9b1448e1351f11409bd9a576a86923d1e7952",
+          "url": "https://github.com/arun-gupta/quizpop/commit/319ef6780b14e3a879e3eacc685e614a816e07b5"
+        },
+        "date": 1779767148999,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1903,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2018,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1732,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2385,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1733,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1934,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2807,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3341,
             "unit": "ms"
           }
         ]
