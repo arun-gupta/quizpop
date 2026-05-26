@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { PublicQuestion } from '@/types/database'
 import CountdownTimer from '@/components/game/CountdownTimer'
 import AnswerButton from '@/components/game/AnswerButton'
@@ -83,6 +84,15 @@ export default function PlayerQuestion({
           </p>
         </div>
       </div>
+
+      {/* Image — only shown before reveal */}
+      {question.image_url && question.image_reveal !== 'after' && (
+        <div className="px-4 pb-2">
+          <div className="relative h-36 w-full rounded-2xl overflow-hidden shadow-lg">
+            <Image src={question.image_url} alt="Question image" fill className="object-cover" />
+          </div>
+        </div>
+      )}
 
       {/* Answer buttons */}
       <div className="flex-1 px-4 pb-4 grid grid-cols-2 gap-3">

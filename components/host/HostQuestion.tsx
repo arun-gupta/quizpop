@@ -84,8 +84,8 @@ export default function HostQuestion({
           </p>
         </div>
 
-        {/* Image */}
-        {question.image_url && (
+        {/* Image — only shown before reveal */}
+        {question.image_url && question.image_reveal !== 'after' && (
           <div className="flex justify-center flex-shrink-0">
             <div className="relative h-52 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
               <Image

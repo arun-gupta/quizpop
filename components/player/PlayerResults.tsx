@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { PublicQuestion } from '@/types/database'
 
 const ANSWER_CONFIG = [
@@ -52,6 +53,15 @@ export default function PlayerResults({
             : "Time's up!"}
         </p>
       </div>
+
+      {/* Reveal image */}
+      {question.image_url && question.image_reveal === 'after' && (
+        <div className="px-4 pt-3">
+          <div className="relative h-40 w-full rounded-2xl overflow-hidden shadow-lg">
+            <Image src={question.image_url} alt="Question image" fill className="object-cover" />
+          </div>
+        </div>
+      )}
 
       {/* Points earned */}
       <div className="text-center py-5 px-6">

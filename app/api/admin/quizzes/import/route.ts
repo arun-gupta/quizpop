@@ -49,14 +49,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to create quiz' }, { status: 500 })
     }
 
+    // Build image base URL from bucket if provided
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+    const imageBase = parsed.bucket
+      ? `${supabaseUrl}/storage/v1/object/public/${parsed.bucket}/`
+      : null
+
     // Insert questions and answer options
     for (const q of parsed.questions) {
+      const rawImage = q.image_url ?? null
+      const imageUrl = rawImage
+        ? (rawImage.startsWith('https://') ? rawImage : imageBase ? `${imageBase}${rawImage}` : null)
+        : null
+
       const { data: question, error: qError } = await service
         .from('questions')
         .insert({
           quiz_id: quiz.id,
           question_text: q.question_text,
-          image_url: q.image_url ?? null,
+          image_url: imageUrl,
+          image_reveal: q.image_reveal ?? 'before',
           timer_seconds: q.timer_seconds,
           points: q.points,
           display_order: q.display_order,

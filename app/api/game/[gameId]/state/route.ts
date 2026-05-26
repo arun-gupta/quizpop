@@ -129,8 +129,8 @@ export async function GET(
     // Fetch all questions (needed for auto-transitions C & D, and for question display)
     type QuestionRow = {
       id: string; quiz_id: string; question_text: string; image_url: string | null
-      timer_seconds: number; points: number; display_order: number
-      question_type: QuestionType; section_title: string | null
+      image_reveal: 'before' | 'after'; timer_seconds: number; points: number
+      display_order: number; question_type: QuestionType; section_title: string | null
     }
     let questions: QuestionRow[] | null = null
     let currentQuestion: QuestionRow | null = null
@@ -138,7 +138,7 @@ export async function GET(
     if (session.game_state !== 'finished') {
       const { data: qs, error: questionsError } = await supabase
         .from('questions')
-        .select('id, quiz_id, question_text, image_url, timer_seconds, points, display_order, question_type, section_title')
+        .select('id, quiz_id, question_text, image_url, image_reveal, timer_seconds, points, display_order, question_type, section_title')
         .eq('quiz_id', session.quiz_id)
         .order('display_order', { ascending: true })
 
@@ -276,10 +276,15 @@ export async function GET(
           return NextResponse.json({ error: 'Failed to fetch answer options' }, { status: 500 })
         }
 
-        // Shuffle so the correct answer isn't always in the same position
+        // Shuffle deterministically using gameId + questionId as seed so every
+        // client polling this endpoint sees the same colour→answer mapping.
+        const seed = [...`${gameId}${currentQuestion.id}`].reduce(
+          (h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0
+        )
         const shuffled = [...(answerOptions ?? [])]
         for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
+          const x = Math.sin(seed + i) * 10000
+          const j = Math.floor((x - Math.floor(x)) * (i + 1));
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
         }
 

@@ -21,6 +21,7 @@ export interface Question {
   quiz_id: string
   question_text: string
   image_url: string | null
+  image_reveal: 'before' | 'after'
   timer_seconds: number
   points: number
   display_order: number
@@ -133,6 +134,7 @@ export interface PublicQuestion {
   quiz_id: string
   question_text: string
   image_url: string | null
+  image_reveal: 'before' | 'after'
   timer_seconds: number
   points: number
   display_order: number

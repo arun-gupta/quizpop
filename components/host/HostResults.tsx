@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { PublicQuestion, Player, WordCloudEntry } from '@/types/database'
 import WordCloud from '@/components/game/WordCloud'
 
@@ -56,6 +57,15 @@ export default function HostResults({
           </h2>
         </div>
       </div>
+
+      {/* Reveal image — shown only after answer */}
+      {question.image_url && question.image_reveal === 'after' && (
+        <div className="flex justify-center px-8 pb-2">
+          <div className="relative h-48 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
+            <Image src={question.image_url} alt="Question image" fill className="object-cover" />
+          </div>
+        </div>
+      )}
 
       {/* Body: word cloud or answer distribution */}
       <div className="flex-1 px-8 py-4">

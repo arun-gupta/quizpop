@@ -1,6 +1,7 @@
 export interface ParsedQuiz {
   title: string
   description: string
+  bucket?: string
   questions: ParsedQuestion[]
   errors: string[]
   warnings: string[]
@@ -9,6 +10,7 @@ export interface ParsedQuiz {
 export interface ParsedQuestion {
   question_text: string
   image_url?: string
+  image_reveal: 'before' | 'after'
   timer_seconds: number
   points: number
   display_order: number
@@ -50,11 +52,17 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
     result.errors.push('Quiz title is required — add a line like: # My Quiz Title')
   }
 
-  // Optional description: next non-empty lines before first ## or ###
+  // Optional header metadata + description: lines before first ## or ###
+  // > bucket: quiz-images/mihir  ← sets image base bucket
   const descLines: string[] = []
   while (i < lines.length && !lines[i].trim().startsWith('## ') && !lines[i].trim().startsWith('### ')) {
     const line = lines[i].trim()
-    if (line && !line.startsWith('#')) descLines.push(line)
+    if (line.startsWith('> ')) {
+      const bucketMatch = line.slice(2).match(/bucket:\s*(\S+)/i)
+      if (bucketMatch) result.bucket = bucketMatch[1].replace(/\/$/, '')
+    } else if (line && !line.startsWith('#')) {
+      descLines.push(line)
+    }
     i++
   }
   result.description = descLines.join(' ').trim()
@@ -95,6 +103,7 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
       currentQuestion = {
         question_text: line.slice(4).trim(),
         image_url: undefined,
+        image_reveal: 'before',
         timer_seconds: DEFAULT_TIMER,
         points: DEFAULT_POINTS,
         display_order: 0,
@@ -112,11 +121,13 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
       const meta = line.slice(2)
       const timerMatch = meta.match(/timer:\s*(\d+)/i)
       const pointsMatch = meta.match(/points:\s*(\d+)/i)
-      const imageMatch = meta.match(/image:\s*(https?:\/\/\S+)/i)
+      const imageMatch = meta.match(/image:\s*(\S+)/i)
+      const revealMatch = meta.match(/reveal:\s*(before|after)/i)
       const typeMatch = meta.match(/type:\s*(open_text|multiple_choice)/i)
       if (timerMatch) currentQuestion.timer_seconds = parseInt(timerMatch[1], 10)
       if (pointsMatch) currentQuestion.points = parseInt(pointsMatch[1], 10)
       if (imageMatch) currentQuestion.image_url = imageMatch[1].trim()
+      if (revealMatch) currentQuestion.image_reveal = revealMatch[1].toLowerCase() as 'before' | 'after'
       if (typeMatch) currentQuestion.question_type = typeMatch[1].toLowerCase() as 'multiple_choice' | 'open_text'
       continue
     }
