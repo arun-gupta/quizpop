@@ -5,10 +5,10 @@ import { parseQuizMarkdown } from '@/lib/quiz-markdown'
 import type { ParsedQuiz, ParsedQuestion } from '@/lib/quiz-markdown'
 
 const ANSWER_CONFIG = [
-  { bg: 'bg-red-500',    emoji: '▲' },
-  { bg: 'bg-blue-500',   emoji: '◆' },
-  { bg: 'bg-yellow-500', emoji: '●' },
-  { bg: 'bg-green-500',  emoji: '■' },
+  { bg: 'bg-red-500',    dimBg: 'bg-red-900/40',    emoji: '▲' },
+  { bg: 'bg-blue-500',   dimBg: 'bg-blue-900/40',   emoji: '◆' },
+  { bg: 'bg-yellow-500', dimBg: 'bg-yellow-900/40', emoji: '●' },
+  { bg: 'bg-green-500',  dimBg: 'bg-green-900/40',  emoji: '■' },
 ]
 
 function resolveImageUrl(imageUrl: string | undefined, bucket: string | undefined): string | null {
@@ -21,7 +21,7 @@ function resolveImageUrl(imageUrl: string | undefined, bucket: string | undefine
   return null
 }
 
-function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined, bucket?: string }) {
+function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined; bucket?: string }) {
   const [failed, setFailed] = useState(false)
   const url = resolveImageUrl(rawValue, bucket)
 
@@ -29,12 +29,10 @@ function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined, buc
 
   if (!url || failed) {
     return (
-      <div className="flex justify-center flex-shrink-0">
+      <div className="flex justify-center">
         <div className="h-52 w-full max-w-lg rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 bg-white/5">
           <span className="text-4xl">🖼️</span>
-          <p className="text-white/40 text-sm font-semibold">
-            {url ? 'Image not found' : 'No bucket configured'}
-          </p>
+          <p className="text-white/40 text-sm font-semibold">{url ? 'Image not found' : 'No bucket configured'}</p>
           <p className="text-white/25 text-xs font-mono">{rawValue}</p>
         </div>
       </div>
@@ -42,38 +40,49 @@ function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined, buc
   }
 
   return (
-    <div className="flex justify-center flex-shrink-0">
+    <div className="flex justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={url}
-        alt="Question image"
-        onError={() => setFailed(true)}
-        className="h-52 max-w-lg w-full rounded-2xl object-cover shadow-xl"
-      />
+      <img src={url} alt="Question image" onError={() => setFailed(true)}
+        className="h-52 max-w-lg w-full rounded-2xl object-cover shadow-xl" />
     </div>
   )
 }
 
-function QuestionCard({ question, index, total, bucket }: {
+function QuestionCard({ question, index, total, bucket, view }: {
   question: ParsedQuestion
   index: number
   total: number
   bucket?: string
+  view: 'question' | 'results'
 }) {
+  const showImageNow =
+    question.image_url &&
+    (view === 'results' ? question.image_reveal === 'after' : question.image_reveal !== 'after')
+
+  const showRevealHint = question.image_url && question.image_reveal === 'after' && view === 'question'
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-8 pt-6 pb-2">
-        <div className="text-white/60 text-xl font-semibold">
-          Question #{index + 1} <span className="text-white/30">of {total}</span>
+      {/* Result banner (results view only) */}
+      {view === 'results' && (
+        <div className="w-full py-4 text-center bg-gradient-to-r from-green-600 to-emerald-500 shadow-xl">
+          <div className="text-4xl mb-1">✅</div>
+          <p className="text-white text-xl font-extrabold">Correct!</p>
         </div>
-        <div className="w-16 h-16 rounded-full border-4 border-purple-400 flex items-center justify-center">
-          <span className="text-white text-2xl font-extrabold">{question.timer_seconds}</span>
+      )}
+
+      {/* Top bar (question view only) */}
+      {view === 'question' && (
+        <div className="flex items-center justify-between px-8 pt-6 pb-2">
+          <div className="text-white/60 text-xl font-semibold">
+            Question #{index + 1} <span className="text-white/30">of {total}</span>
+          </div>
+          <div className="w-16 h-16 rounded-full border-4 border-purple-400 flex items-center justify-center">
+            <span className="text-white text-2xl font-extrabold">{question.timer_seconds}</span>
+          </div>
+          <div className="text-white/60 text-xl font-semibold">{question.points.toLocaleString()} pts</div>
         </div>
-        <div className="text-white/60 text-xl font-semibold">
-          {question.points.toLocaleString()} pts
-        </div>
-      </div>
+      )}
 
       {/* Question body */}
       <div className="flex-1 flex flex-col px-8 py-4 gap-4">
@@ -86,21 +95,22 @@ function QuestionCard({ question, index, total, bucket }: {
         )}
 
         <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20">
-          <p className="text-white text-3xl font-bold text-center leading-snug">
-            {question.question_text}
-          </p>
+          <p className="text-white text-3xl font-bold text-center leading-snug">{question.question_text}</p>
         </div>
 
-        <QuestionImage rawValue={question.image_url} bucket={bucket} />
+        {/* Image */}
+        {showImageNow && <QuestionImage rawValue={question.image_url} bucket={bucket} />}
 
-        {question.image_url && question.image_reveal === 'after' && (
-          <div className="flex justify-center flex-shrink-0">
-            <div className="h-10 w-full max-w-lg rounded-xl border border-dashed border-yellow-400/50 flex items-center justify-center gap-2 bg-yellow-900/20">
-              <span className="text-yellow-400 text-xs font-semibold">🖼️ Image reveals after answer</span>
+        {/* Hint banner when image is hidden pending reveal */}
+        {showRevealHint && (
+          <div className="flex justify-center">
+            <div className="h-10 w-full max-w-lg rounded-xl border border-dashed border-yellow-400/40 flex items-center justify-center gap-2 bg-yellow-900/20">
+              <span className="text-yellow-400 text-xs font-semibold">🖼️ Image reveals after answer — switch to Results view</span>
             </div>
           </div>
         )}
 
+        {/* Answers */}
         {question.question_type === 'open_text' ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="bg-white/10 border border-white/20 rounded-3xl p-8 text-center w-full max-w-lg">
@@ -108,24 +118,34 @@ function QuestionCard({ question, index, total, bucket }: {
               <p className="text-white/30 text-sm">Players type their answer</p>
             </div>
           </div>
-        ) : (
+        ) : view === 'question' ? (
           <div className="grid grid-cols-2 gap-4 flex-1">
             {question.answer_options.map((opt, i) => {
               const cfg = ANSWER_CONFIG[i % 4]
               return (
-                <div
-                  key={i}
-                  className={[
-                    'rounded-2xl p-4 flex items-center gap-4 shadow-lg relative',
-                    cfg.bg,
-                    opt.is_correct ? 'ring-4 ring-white ring-offset-2 ring-offset-transparent' : '',
-                  ].join(' ')}
-                >
+                <div key={i} className={['rounded-2xl p-4 flex items-center gap-4 shadow-lg relative', cfg.bg,
+                  opt.is_correct ? 'ring-4 ring-white ring-offset-2 ring-offset-transparent' : ''].join(' ')}>
                   <span className="text-white text-3xl w-10 text-center flex-shrink-0">{cfg.emoji}</span>
                   <span className="text-white text-xl font-bold leading-snug">{opt.answer_text}</span>
-                  {opt.is_correct && (
-                    <span className="absolute top-2 right-3 text-white text-lg">✓</span>
-                  )}
+                  {opt.is_correct && <span className="absolute top-2 right-3 text-white text-lg">✓</span>}
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          /* Results view — highlight correct, dim others */
+          <div className="space-y-2">
+            {question.answer_options.map((opt, i) => {
+              const cfg = ANSWER_CONFIG[i % 4]
+              return (
+                <div key={i} className={['flex items-center gap-3 px-4 py-3 rounded-2xl',
+                  opt.is_correct ? `${cfg.bg}` : `${cfg.dimBg} opacity-50`].join(' ')}>
+                  <span className="w-8 h-8 flex items-center justify-center rounded-full bg-black/20 text-white text-lg flex-shrink-0">
+                    {opt.is_correct ? '✓' : cfg.emoji}
+                  </span>
+                  <span className={['text-base font-bold', opt.is_correct ? 'text-white' : 'text-white/60'].join(' ')}>
+                    {opt.answer_text}
+                  </span>
                 </div>
               )
             })}
@@ -140,13 +160,16 @@ export default function PreviewPage() {
   const [markdown, setMarkdown] = useState('')
   const [quiz, setQuiz] = useState<ParsedQuiz | null>(null)
   const [qIndex, setQIndex] = useState(0)
+  const [view, setView] = useState<'question' | 'results'>('question')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const parse = (md: string) => {
-    const result = parseQuizMarkdown(md)
-    setQuiz(result)
+    setQuiz(parseQuizMarkdown(md))
     setQIndex(0)
+    setView('question')
   }
+
+  const goTo = (i: number) => { setQIndex(i); setView('question') }
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -157,49 +180,58 @@ export default function PreviewPage() {
   }
 
   const question = quiz?.questions[qIndex] ?? null
+  const hasRevealImage = !!(question?.image_url && question.image_reveal === 'after')
 
   if (quiz && quiz.errors.length === 0 && question) {
     return (
       <div className="relative">
-        <QuestionCard question={question} index={qIndex} total={quiz.questions.length} bucket={quiz.bucket} />
+        <QuestionCard question={question} index={qIndex} total={quiz.questions.length} bucket={quiz.bucket} view={view} />
 
-        {/* Navigation overlay */}
+        {/* Navigation bar */}
         <div className="fixed bottom-0 inset-x-0 bg-black/60 backdrop-blur-sm px-6 py-3 flex items-center justify-between gap-4 z-10">
-          <button
-            onClick={() => setQIndex(i => Math.max(0, i - 1))}
-            disabled={qIndex === 0}
-            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white font-semibold transition-colors"
-          >
+          <button onClick={() => goTo(Math.max(0, qIndex - 1))} disabled={qIndex === 0}
+            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white font-semibold transition-colors">
             ← Prev
           </button>
 
-          <div className="flex items-center gap-2 overflow-x-auto max-w-xl">
-            {quiz.questions.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setQIndex(i)}
-                className={[
-                  'w-6 h-6 rounded-full text-xs font-bold flex-shrink-0 transition-colors',
-                  i === qIndex ? 'bg-purple-400 text-white' : 'bg-white/20 text-white/60 hover:bg-white/30',
-                ].join(' ')}
-              >
-                {i + 1}
+          <div className="flex flex-col items-center gap-2">
+            {/* Question/Results toggle — always visible */}
+            <div className="flex rounded-xl overflow-hidden border border-white/20">
+              <button onClick={() => setView('question')}
+                className={['px-4 py-1.5 text-sm font-semibold transition-colors',
+                  view === 'question' ? 'bg-purple-600 text-white' : 'bg-white/10 text-white/50 hover:bg-white/20'].join(' ')}>
+                Question
               </button>
-            ))}
+              <button onClick={() => setView('results')}
+                className={['px-4 py-1.5 text-sm font-semibold transition-colors flex items-center gap-1.5',
+                  view === 'results' ? 'bg-purple-600 text-white' : 'bg-white/10 text-white/50 hover:bg-white/20',
+                  hasRevealImage ? 'ring-1 ring-inset ring-yellow-400/60' : ''].join(' ')}>
+                Results
+                {hasRevealImage && <span className="text-yellow-400 text-xs">🖼️</span>}
+              </button>
+            </div>
+
+            {/* Dot navigation */}
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-sm">
+              {quiz.questions.map((q, i) => (
+                <button key={i} onClick={() => goTo(i)}
+                  className={['w-5 h-5 rounded-full text-xs font-bold flex-shrink-0 transition-colors',
+                    i === qIndex ? 'bg-purple-400 text-white' : 'bg-white/20 text-white/60 hover:bg-white/30',
+                    q.image_url && q.image_reveal === 'after' ? 'ring-1 ring-yellow-400/60' : ''].join(' ')}>
+                  {i + 1}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => { setQuiz(null); setMarkdown('') }}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/60 text-sm font-semibold transition-colors"
-            >
+            <button onClick={() => { setQuiz(null); setMarkdown('') }}
+              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white/60 text-sm font-semibold transition-colors">
               ✕ Close
             </button>
-            <button
-              onClick={() => setQIndex(i => Math.min(quiz.questions.length - 1, i + 1))}
+            <button onClick={() => goTo(Math.min(quiz.questions.length - 1, qIndex + 1))}
               disabled={qIndex === quiz.questions.length - 1}
-              className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white font-semibold transition-colors"
-            >
+              className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white font-semibold transition-colors">
               Next →
             </button>
           </div>
@@ -215,41 +247,26 @@ export default function PreviewPage() {
           <h1 className="text-3xl font-extrabold text-white mb-1">Quiz Preview</h1>
           <p className="text-white/50 text-sm">Renders your markdown exactly as it will look in-game</p>
         </div>
-
-        {/* Upload */}
         <div>
           <input ref={fileRef} type="file" accept=".md,.txt" className="hidden" onChange={handleFile} />
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="w-full border-2 border-dashed border-white/30 hover:border-purple-400 rounded-2xl p-6 text-center transition-colors cursor-pointer"
-          >
+          <button onClick={() => fileRef.current?.click()}
+            className="w-full border-2 border-dashed border-white/30 hover:border-purple-400 rounded-2xl p-6 text-center transition-colors cursor-pointer">
             <p className="text-white font-semibold">Click to upload a .md file</p>
             <p className="text-white/40 text-sm mt-1">or paste below</p>
           </button>
         </div>
-
-        {/* Paste */}
-        <textarea
-          value={markdown}
-          onChange={e => { setMarkdown(e.target.value); setQuiz(null) }}
+        <textarea value={markdown} onChange={e => { setMarkdown(e.target.value); setQuiz(null) }}
           placeholder="# My Quiz&#10;> bucket: quiz-images/folder&#10;&#10;## Section&#10;&#10;### Question text?&#10;- [ ] Wrong&#10;- [x] Right"
           rows={8}
-          className="bg-black/30 border border-white/20 rounded-xl p-4 text-sm text-white font-mono resize-none focus:outline-none focus:border-purple-400 placeholder:text-white/20"
-        />
-
-        {/* Errors */}
+          className="bg-black/30 border border-white/20 rounded-xl p-4 text-sm text-white font-mono resize-none focus:outline-none focus:border-purple-400 placeholder:text-white/20" />
         {quiz && quiz.errors.length > 0 && (
           <div className="bg-red-900/40 border border-red-500/50 rounded-xl p-4 space-y-1">
             <p className="text-red-400 font-semibold text-sm">{quiz.errors.length} error{quiz.errors.length > 1 ? 's' : ''}</p>
             {quiz.errors.map((e, i) => <p key={i} className="text-red-300 text-xs pl-2">{e}</p>)}
           </div>
         )}
-
-        <button
-          onClick={() => parse(markdown)}
-          disabled={!markdown.trim()}
-          className="w-full py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-lg font-extrabold transition-colors"
-        >
+        <button onClick={() => parse(markdown)} disabled={!markdown.trim()}
+          className="w-full py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-lg font-extrabold transition-colors">
           Preview Quiz →
         </button>
       </div>

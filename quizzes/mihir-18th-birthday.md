@@ -18,20 +18,6 @@ How well do you know Mihir — and the world he was born into?
 - [x] Barack Obama was elected US President
 - [ ] Twitter launched
 
-### The biggest movie of 2008 was The Dark Knight. Who played the Joker?
-> timer: 20 | points: 1000 | image: 
-- [ ] Jack Nicholson
-- [ ] Jared Leto
-- [x] Heath Ledger
-- [ ] Joaquin Phoenix
-
-### Which song was the biggest global hit the year Mihir was born?
-> timer: 25 | points: 1000 | image: 
-- [ ] Umbrella – Rihanna
-- [x] Just Dance – Lady Gaga
-- [ ] Boom Boom Pow – Black Eyed Peas
-- [ ] Single Ladies – Beyoncé
-
 ### Which technology did NOT exist when Mihir was born in 2008?
 > timer: 20 | points: 1000 | image: 
 - [ ] YouTube
@@ -49,14 +35,14 @@ How well do you know Mihir — and the world he was born into?
 ## Growing Up
 
 ### What was Mihir's first school?
-> timer: 20 | points: 1000 | image: mihir-school.jpeg
+> timer: 20 | points: 1000 | image: mihir-school.jpeg | reveal: after
 - [ ] Challenger Academy
 - [ ] Country Lane
 - [x] Champion
 - [ ] Easterbrook Discovery
 
 ### As a kid, most of Mihir's photos are on whose shoulder?
-> timer: 20 | points: 1000 | image: varun.jpeg
+> timer: 20 | points: 1000 | image: varun.jpeg | reveal: after
 - [ ] His Dad
 - [ ] His Grandpa
 - [ ] His elder brother, Aditya
@@ -70,7 +56,7 @@ How well do you know Mihir — and the world he was born into?
 - [ ] The Lion King
 
 ### Which family vacation destination did Mihir enjoy the most?
-> timer: 20 | points: 1000 | image: disneyland.jpeg
+> timer: 20 | points: 1000 | image: disneyland.jpeg | reveal: after
 - [ ] Hawaii
 - [ ] Kilimanjaro
 - [ ] India
@@ -89,7 +75,7 @@ How well do you know Mihir — and the world he was born into?
 > type: open_text | timer: 30 | points: 500 | image: 
 
 ### What activity consumed the most of Mihir's time in high school?
-> timer: 20 | points: 1000 | image: 
+> timer: 20 | points: 1000 | image: scouting.jpeg | reveal: after
 - [ ] Gaming
 - [x] Scouting
 - [ ] Basketball
@@ -136,7 +122,7 @@ How well do you know Mihir — and the world he was born into?
 - [ ] Snapchat
 
 ### What is Mihir's comfort food?
-> timer: 15 | points: 500 | image: 
+> timer: 15 | points: 500 | image: pizza.jpeg | reveal: after
 - [X] Pizza
 - [ ] Biryani
 - [ ] Dosa
@@ -150,7 +136,7 @@ How well do you know Mihir — and the world he was born into?
 - [x] Protein shake
 
 ### What is something Mihir absolutely cannot live without?
-> timer: 15 | points: 500 | image: 
+> timer: 15 | points: 500 | image: phone.jpeg | reveal: after
 - [ ] Protein powder
 - [ ] His AirPods
 - [ ] His bed
@@ -164,7 +150,7 @@ How well do you know Mihir — and the world he was born into?
 - [x] His AirPods
 
 ### What is Mihir's hidden talent?
-> timer: 20 | points: 1000 | image: 
+> timer: 20 | points: 1000 | image: abs.jpeg | reveal: after
 - [ ] Solving a Rubik's cube in under a minute
 - [ ] Beatboxing
 - [x] Taking pictures of his abs in front of the mirror
@@ -180,14 +166,14 @@ How well do you know Mihir — and the world he was born into?
 - [ ] The family group chat
 
 ### During a family trip, what role does Mihir usually play?
-> timer: 20 | points: 1000 | image: 
+> timer: 20 | points: 1000 | image: sleeping.jpeg | reveal: after
 - [ ] Trip planner
 - [ ] Entertainer
 - [x] Sleeper in the back seat
 - [ ] Professional snack manager
 
 ### Which continent did Mihir travel to alone with his brother?
-> timer: 20 | points: 2000 | image: 
+> timer: 20 | points: 2000 | image: australia.jpeg | reveal: after
 - [ ] Europe
 - [ ] South America
 - [ ] Africa
