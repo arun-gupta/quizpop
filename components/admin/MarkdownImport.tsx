@@ -115,7 +115,7 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
           <textarea
             value={markdown}
             onChange={e => setMarkdown(e.target.value)}
-            placeholder={`# My Quiz\nA fun quiz for all ages!\n\n## What color is the sky?\n- [ ] Red\n- [x] Blue\n- [ ] Green`}
+            placeholder={`# My Quiz\nA fun quiz for all ages!\n\n### What color is the sky?\n- [ ] Red\n- [x] Blue\n- [ ] Green`}
             className="flex-1 min-h-[220px] bg-gray-900 border border-gray-600 rounded-lg p-3 text-sm text-gray-100 font-mono resize-none focus:outline-none focus:border-purple-500 placeholder:text-gray-600"
           />
         </div>
@@ -192,25 +192,35 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
           <pre className="bg-gray-900 rounded-lg p-4 text-gray-100 text-xs leading-relaxed overflow-x-auto whitespace-pre">{`# Quiz Title
 Optional description text here.
 
-## Question text goes here?
+## Section Name   ← optional grouping
+
+### Question text goes here?
 - [ ] Wrong answer
 - [x] Correct answer   ← mark correct with [x]
 - [ ] Another wrong answer
 - [ ] One more
 
-## Another question with custom settings
-> timer: 15 | points: 500
+### Question with an image shown upfront
+> image: https://example.com/photo.jpg | timer: 15 | points: 500
 - [x] Right!
-- [ ] Nope`}</pre>
+- [ ] Nope
+
+### Question where image is the reveal
+> image: https://example.com/mystery.jpg | reveal: after
+- [x] Correct
+- [ ] Wrong`}</pre>
           <div className="space-y-2 text-gray-400">
             <p><span className="text-white font-medium"># Title</span> — quiz name (required, one only)</p>
-            <p><span className="text-white font-medium">## Question</span> — starts a new question</p>
+            <p><span className="text-white font-medium">## Section</span> — optional section label (shown above question)</p>
+            <p><span className="text-white font-medium">### Question</span> — starts a new question</p>
             <p><span className="text-white font-medium">- [x] Answer</span> — correct answer (exactly 1 per question)</p>
             <p><span className="text-white font-medium">- [ ] Answer</span> — wrong answer (2–4 options total)</p>
-            <p><span className="text-white font-medium">&gt; timer: N | points: N</span> — optional, after the question line</p>
+            <p><span className="text-white font-medium">&gt; image: URL</span> — attach an image to the question</p>
+            <p><span className="text-white font-medium">&gt; reveal: after</span> — hide image during question, show it on the results screen</p>
+            <p><span className="text-white font-medium">&gt; timer: N | points: N</span> — override timer (seconds) and point value</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-3 text-xs text-gray-400">
-            Defaults: <span className="text-gray-200">timer = 20s</span>, <span className="text-gray-200">points = 1000</span>
+            Defaults: <span className="text-gray-200">timer = 20s</span>, <span className="text-gray-200">points = 1000</span>, <span className="text-gray-200">reveal = before</span>
           </div>
           <button onClick={loadExample} className="flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm">
             <Copy size={14} /> Load example into editor
