@@ -225,19 +225,13 @@ export async function POST(
       : { count: 0 }
 
     if (
+      currentQuestion.question_type !== 'open_text' &&
       typeof responseCount === 'number' &&
       typeof playerCount === 'number' &&
       playerCount > 0 &&
       responseCount >= playerCount
     ) {
-      if (currentQuestion.question_type === 'open_text') {
-        // Open text: reveal with no correct_answer_id
-        await supabase
-          .from('game_sessions')
-          .update({ game_state: 'question_results', correct_answer_id: null })
-          .eq('id', gameId)
-          .eq('game_state', 'question_active')
-      } else {
+      {
         // Multiple choice: reveal the correct answer
         const { data: correctOption } = await supabase
           .from('answer_options')
