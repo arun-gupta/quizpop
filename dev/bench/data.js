@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779815448223,
+  "lastUpdate": 1779816221088,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -1533,6 +1533,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3298,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "3334cceef1a3a17cde8471c215a299d9dc470eb9",
+          "message": "feat: live word cloud on host screen during open-text questions\n\n- State route now returns word cloud during question_active (not just\n  question_results) for open_text questions.\n- Host Realtime subscription triggers a state refresh on each free-text\n  response INSERT, so the word cloud updates as players submit.\n- HostQuestion shows the live word cloud instead of empty space for\n  open_text questions.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T10:22:28-07:00",
+          "tree_id": "75ce8902264c533bc870b9597cd68b1a0439a51c",
+          "url": "https://github.com/arun-gupta/quizpop/commit/3334cceef1a3a17cde8471c215a299d9dc470eb9"
+        },
+        "date": 1779816220503,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 2209,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2315,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1908,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2065,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1773,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1999,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2789,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3102,
             "unit": "ms"
           }
         ]
