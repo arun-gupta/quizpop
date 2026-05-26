@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779754720615,
+  "lastUpdate": 1779754946345,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -317,6 +317,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 2554,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "a88df097c13c7cd2f92bfa37c16404123b9f6fd8",
+          "message": "Fix charts not rendering: replace innerHTML+= with insertAdjacentHTML\n\ninnerHTML += re-serializes the entire DOM on each iteration, destroying\npreviously-created canvas elements and their Chart.js contexts. Only the\nlast chart survived. insertAdjacentHTML('beforeend') appends without\ntouching existing nodes.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-25T17:21:15-07:00",
+          "tree_id": "8efbf9babd5f2a8d445fc8244133b8e50c83a0e5",
+          "url": "https://github.com/arun-gupta/quizpop/commit/a88df097c13c7cd2f92bfa37c16404123b9f6fd8"
+        },
+        "date": 1779754945611,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1665,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 1875,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 2038,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2563,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1663,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1912,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2337,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3014,
             "unit": "ms"
           }
         ]
