@@ -84,8 +84,8 @@ function QuestionCard({ question, index, total, bucket, view }: {
         </div>
       )}
 
-      {/* Question body */}
-      <div className="flex-1 flex flex-col px-8 py-4 gap-4">
+      {/* Question body — pb-20 leaves room for the fixed nav bar */}
+      <div className="flex-1 flex flex-col px-8 py-4 pb-20 gap-4">
         {question.section_title && (
           <div className="flex justify-center">
             <span className="bg-white/10 border border-white/20 text-white/60 text-sm font-semibold tracking-widest uppercase px-5 py-1.5 rounded-full">
