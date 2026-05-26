@@ -26,9 +26,7 @@ export default function PlayerResults({
   totalScore,
 }: PlayerResultsProps) {
   const isCorrect = selectedAnswerId === correctAnswerId
-  const sortedOptions = [...question.answer_options].sort(
-    (a, b) => a.display_order - b.display_order
-  )
+  const sortedOptions = [...question.answer_options]
 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">

@@ -75,9 +75,7 @@ export default function HostResults({
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
-            {[...question.answer_options]
-              .sort((a, b) => a.display_order - b.display_order)
-              .map((option, i) => {
+            {[...question.answer_options].map((option, i) => {
                 const config = ANSWER_CONFIG[i % 4]
                 const isCorrect = option.id === correctAnswerId
                 const count = answerDistribution[option.id] ?? 0
