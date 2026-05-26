@@ -96,40 +96,20 @@ export async function POST(
       return NextResponse.json({ error: 'Player not found in this game session' }, { status: 403 })
     }
 
-    // Check for duplicate submission (player already answered this question)
-    const { data: existingResponse, error: dupeCheckError } = await supabase
-      .from('player_responses')
-      .select('id, is_correct, awarded_points, selected_answer_id')
-      .eq('player_id', playerId)
-      .eq('question_id', currentQuestion.id)
-      .maybeSingle()
-
-    if (dupeCheckError) {
-      console.error('Duplicate check error:', dupeCheckError)
-      return NextResponse.json({ error: 'Failed to validate submission' }, { status: 500 })
-    }
-
-    if (existingResponse) {
-      // Return 409 with existing response data (no peeking at correct answer)
-      return NextResponse.json(
-        {
-          error: 'Already submitted an answer for this question.',
-          isCorrect: existingResponse.is_correct,
-          awardedPoints: existingResponse.awarded_points,
-          correctAnswerId: null,
-        },
-        { status: 409 }
-      )
-    }
-
     let isCorrect: boolean
     let awardedPoints: number
     let insertPayload: Record<string, unknown>
 
     if (currentQuestion.question_type === 'open_text') {
-      // Open text: everyone who answers gets base participation points
+      // Open text: multiple submissions allowed; points only on the first one
+      const { count: priorCount } = await supabase
+        .from('player_responses')
+        .select('*', { count: 'exact', head: true })
+        .eq('player_id', playerId)
+        .eq('question_id', currentQuestion.id)
+
       isCorrect = true
-      awardedPoints = currentQuestion.points
+      awardedPoints = (priorCount ?? 0) === 0 ? currentQuestion.points : 0
       insertPayload = {
         player_id: playerId,
         question_id: currentQuestion.id,
@@ -140,7 +120,32 @@ export async function POST(
         awarded_points: awardedPoints,
       }
     } else {
-      // Multiple choice: look up the chosen option
+      // Multiple choice: reject duplicate submissions
+      const { data: existingResponse, error: dupeCheckError } = await supabase
+        .from('player_responses')
+        .select('id, is_correct, awarded_points')
+        .eq('player_id', playerId)
+        .eq('question_id', currentQuestion.id)
+        .maybeSingle()
+
+      if (dupeCheckError) {
+        console.error('Duplicate check error:', dupeCheckError)
+        return NextResponse.json({ error: 'Failed to validate submission' }, { status: 500 })
+      }
+
+      if (existingResponse) {
+        return NextResponse.json(
+          {
+            error: 'Already submitted an answer for this question.',
+            isCorrect: existingResponse.is_correct,
+            awardedPoints: existingResponse.awarded_points,
+            correctAnswerId: null,
+          },
+          { status: 409 }
+        )
+      }
+
+      // Look up the chosen option
       const { data: answerOption, error: answerError } = await supabase
         .from('answer_options')
         .select('id, question_id, is_correct')

@@ -217,6 +217,7 @@ Optional description text here.
             <p><span className="text-white font-medium">- [ ] Answer</span> — wrong answer (2–4 options total)</p>
             <p><span className="text-white font-medium">&gt; image: URL</span> — attach an image to the question</p>
             <p><span className="text-white font-medium">&gt; reveal: after</span> — hide image during question, show it on the results screen</p>
+            <p><span className="text-white font-medium">&gt; type: open_text</span> — free-text question (players type their answer; word cloud on results)</p>
             <p><span className="text-white font-medium">&gt; timer: N | points: N</span> — override timer (seconds) and point value</p>
           </div>
           <div className="bg-gray-800 rounded-lg p-3 text-xs text-gray-400">

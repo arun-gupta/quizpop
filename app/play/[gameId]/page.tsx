@@ -70,6 +70,7 @@ interface PlayerQuestionProps {
   onAnswer: (answerId: string) => void
   onTextAnswer: (text: string) => void
   isSubmitting: boolean
+  submittedTexts?: string[]
 }
 
 const ANSWER_CONFIG = [
@@ -79,7 +80,7 @@ const ANSWER_CONFIG = [
   { bg: 'bg-green-500 hover:bg-green-400 active:bg-green-600', emoji: '■', shape: 'Square' },
 ]
 
-function PlayerQuestion({ session, question, player, onAnswer, onTextAnswer, isSubmitting }: PlayerQuestionProps) {
+function PlayerQuestion({ session, question, player, onAnswer, onTextAnswer, isSubmitting, submittedTexts = [] }: PlayerQuestionProps) {
   const [timeLeft, setTimeLeft] = useState(question.timer_seconds)
   const [typedAnswer, setTypedAnswer] = useState('')
   const startTime = useRef<number>(
@@ -142,22 +143,42 @@ function PlayerQuestion({ session, question, player, onAnswer, onTextAnswer, isS
 
         {/* Answer area */}
         {question.question_type === 'open_text' ? (
-          <div className="flex flex-col gap-4 flex-1">
+          <div className="flex flex-col gap-3 flex-1">
+            {submittedTexts.length > 0 && (
+              <div className="bg-violet-500/20 border border-violet-400/30 rounded-2xl p-3 space-y-1.5">
+                <p className="text-violet-300 text-xs font-bold uppercase tracking-wider">Your answers ({submittedTexts.length})</p>
+                {submittedTexts.map((t, i) => (
+                  <p key={i} className="text-white font-semibold text-sm">&ldquo;{t}&rdquo;</p>
+                ))}
+              </div>
+            )}
             <textarea
               className="w-full bg-white/10 border-2 border-white/20 rounded-2xl p-4 text-white text-xl font-bold placeholder-white/30 resize-none focus:outline-none focus:border-violet-400 transition-colors"
               rows={3}
               maxLength={120}
-              placeholder="Type your answer…"
+              placeholder={submittedTexts.length === 0 ? 'Type your answer…' : 'Add another answer…'}
               value={typedAnswer}
               onChange={e => setTypedAnswer(e.target.value)}
-              disabled={isSubmitting || timeLeft <= 0}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey && typedAnswer.trim() && !isSubmitting && timeLeft > 0) {
+                  e.preventDefault()
+                  onTextAnswer(typedAnswer.trim())
+                  setTypedAnswer('')
+                }
+              }}
+              disabled={timeLeft <= 0}
             />
             <button
-              onClick={() => !isSubmitting && typedAnswer.trim() && onTextAnswer(typedAnswer.trim())}
+              onClick={() => {
+                if (!isSubmitting && typedAnswer.trim() && timeLeft > 0) {
+                  onTextAnswer(typedAnswer.trim())
+                  setTypedAnswer('')
+                }
+              }}
               disabled={isSubmitting || !typedAnswer.trim() || timeLeft <= 0}
               className="w-full bg-violet-500 hover:bg-violet-400 active:bg-violet-600 text-white text-xl font-extrabold rounded-2xl py-4 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Submit ✓
+              {isSubmitting ? 'Submitting…' : submittedTexts.length === 0 ? 'Submit ✓' : 'Add Answer ✓'}
             </button>
           </div>
         ) : (
@@ -499,6 +520,7 @@ export default function PlayPage() {
   const [correctAnswerId, setCorrectAnswerId] = useState<string | null>(null)
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null)
   const [selectedText, setSelectedText] = useState<string | null>(null)
+  const [submittedTexts, setSubmittedTexts] = useState<string[]>([])
   const [lastResponse, setLastResponse] = useState<PlayerResponse | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -568,6 +590,7 @@ export default function PlayPage() {
         lastQuestionIndexRef.current = currentSession.current_question_index
         setSelectedAnswerId(null)
         setSelectedText(null)
+        setSubmittedTexts([])
         setLastResponse(null)
         setIsSubmitting(false)
       }
@@ -699,7 +722,6 @@ export default function PlayPage() {
     const playerId = JSON.parse(localStorage.getItem(`playerData_${gameId}`) || '{}').playerId
     if (!playerId) return
 
-    setSelectedText(text)
     setIsSubmitting(true)
 
     const responseTimeMs = Date.now() - new Date(session.question_started_at).getTime()
@@ -711,12 +733,17 @@ export default function PlayPage() {
         body: JSON.stringify({ playerId, freeTextResponse: text, responseTimeMs }),
       })
 
-      if (!res.ok) {
+      if (res.ok) {
+        setSelectedText(text)
+        setSubmittedTexts(prev => [...prev, text])
+      } else {
         const data = await res.json()
         console.error('Text answer submission failed:', data.error)
       }
     } catch (err) {
       console.error('Failed to submit text answer:', err)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -768,7 +795,7 @@ export default function PlayPage() {
       )
     }
 
-    if (selectedAnswerId || selectedText) {
+    if (selectedAnswerId || (selectedText && question.question_type !== 'open_text')) {
       return <PlayerAnswered question={question} player={player} selectedAnswerId={selectedAnswerId} selectedText={selectedText} />
     }
 
@@ -780,6 +807,7 @@ export default function PlayPage() {
         onAnswer={submitAnswer}
         onTextAnswer={submitTextAnswer}
         isSubmitting={isSubmitting}
+        submittedTexts={submittedTexts}
       />
     )
   }
