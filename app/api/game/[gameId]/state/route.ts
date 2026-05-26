@@ -62,7 +62,7 @@ export async function GET(
     if (session.game_state !== 'finished') {
       const { data: questions, error: questionsError } = await supabase
         .from('questions')
-        .select('id, quiz_id, question_text, image_url, timer_seconds, points, display_order, question_type')
+        .select('id, quiz_id, question_text, image_url, timer_seconds, points, display_order, question_type, section_title')
         .eq('quiz_id', session.quiz_id)
         .order('display_order', { ascending: true })
 

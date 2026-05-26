@@ -25,6 +25,7 @@ export interface Question {
   points: number
   display_order: number
   question_type: QuestionType
+  section_title: string | null
 }
 
 export interface AnswerOption {
@@ -134,6 +135,7 @@ export interface PublicQuestion {
   points: number
   display_order: number
   question_type: QuestionType
+  section_title: string | null
   answer_options: PublicAnswerOption[]
 }
 

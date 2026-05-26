@@ -105,10 +105,15 @@ jobs:
         run: |
           node -e "
             const fs = require('fs');
-            const r50  = JSON.parse(fs.readFileSync('results-50.json',  'utf8'));
-            const r100 = JSON.parse(fs.readFileSync('results-100.json', 'utf8'));
             const fmt = n => n.toFixed(0) + 'ms';
-            const rows = [r50, r100].map(r =>
+            const results = ['results-50.json', 'results-100.json']
+              .filter(f => fs.existsSync(f))
+              .map(f => JSON.parse(fs.readFileSync(f, 'utf8')));
+            if (results.length === 0) {
+              fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## 🚀 Performance Results\n\n⚠️ Load test did not produce results (deployment may have failed).\n');
+              process.exit(0);
+            }
+            const rows = results.map(r =>
               '| ' + [
                 r.players,
                 r.join.passed + '/' + r.join.total,

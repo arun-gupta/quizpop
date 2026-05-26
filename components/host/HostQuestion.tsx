@@ -78,6 +78,13 @@ export default function HostQuestion({
 
       {/* Question */}
       <div className="flex-1 flex flex-col px-8 py-4 gap-4">
+        {question.section_title && (
+          <div className="flex justify-center">
+            <span className="bg-white/10 border border-white/20 text-white/60 text-sm font-semibold tracking-widest uppercase px-5 py-1.5 rounded-full">
+              {question.section_title}
+            </span>
+          </div>
+        )}
         <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20 flex-shrink-0">
           <p className="text-white text-3xl font-bold text-center leading-snug">
             {question.question_text}

@@ -1,9 +1,7 @@
 # Mihir's 18th Birthday Quiz 🎉
 How well do you know Mihir — and the world he was born into?
 
-<!-- ═══════════════════════════════════════
-     SECTION 1: THE YEAR YOU WERE BORN
-     ═══════════════════════════════════════ -->
+### The Year You Were Born
 
 ## What year was Mihir born?
 > timer: 15 | points: 500
@@ -75,10 +73,7 @@ How well do you know Mihir — and the world he was born into?
 - [ ] $1 billion
 - [x] Over $100 billion
 
-
-<!-- ═══════════════════════════════════════
-     SECTION 2: GROWING UP
-     ═══════════════════════════════════════ -->
+### Growing Up
 
 ## What was Mihir's first school?
 > timer: 20 | points: 1000
@@ -115,10 +110,7 @@ How well do you know Mihir — and the world he was born into?
 - [ ] 13
 - [ ] 15
 
-
-<!-- ═══════════════════════════════════════
-     SECTION 3: HIGH SCHOOL YEARS
-     ═══════════════════════════════════════ -->
+### High School Years
 
 ## What sports did Mihir play in high school?
 > type: open_text | timer: 30 | points: 500
@@ -144,10 +136,7 @@ How well do you know Mihir — and the world he was born into?
 - [ ] Physical Education
 - [x] Religion class
 
-
-<!-- ═══════════════════════════════════════
-     SECTION 4: HOW WELL DO YOU KNOW MIHIR?
-     ═══════════════════════════════════════ -->
+### How Well Do You Know Mihir?
 
 ## What are Mihir's nicknames?
 > type: open_text | timer: 30 | points: 500
@@ -215,10 +204,7 @@ How well do you know Mihir — and the world he was born into?
 - [x] Taking pictures of his abs in front of the mirror
 - [ ] Juggling
 
-
-<!-- ═══════════════════════════════════════
-     SECTION 5: FAMILY & TRAVEL
-     ═══════════════════════════════════════ -->
+### Family & Travel
 
 ## If Mihir needs something urgently, who does he call first?
 > timer: 15 | points: 1000
@@ -241,10 +227,7 @@ How well do you know Mihir — and the world he was born into?
 - [ ] Africa
 - [x] Australia
 
-
-<!-- ═══════════════════════════════════════
-     SECTION 6: THE FUTURE
-     ═══════════════════════════════════════ -->
+### The Future
 
 ## What's Mihir's dream career?
 > timer: 20 | points: 1000
@@ -256,10 +239,7 @@ How well do you know Mihir — and the world he was born into?
 ## What is Mihir most likely to become famous for?
 > type: open_text | timer: 40 | points: 500
 
-
-<!-- ═══════════════════════════════════════
-     SECTION 7: OPEN MIC — YOUR TURN
-     ═══════════════════════════════════════ -->
+### Open Mic
 
 ## What happened 5 minutes before the iconic Joshua Tree photo?
 > type: open_text | timer: 40 | points: 500

@@ -70,6 +70,13 @@ export default function PlayerQuestion({
 
       {/* Question text */}
       <div className="px-4 pb-3">
+        {question.section_title && (
+          <div className="flex justify-center mb-2">
+            <span className="bg-white/10 border border-white/20 text-white/60 text-xs font-semibold tracking-widest uppercase px-4 py-1 rounded-full">
+              {question.section_title}
+            </span>
+          </div>
+        )}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
           <p className="text-white text-lg font-bold text-center leading-snug">
             {question.question_text}

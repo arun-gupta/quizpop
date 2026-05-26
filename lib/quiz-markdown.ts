@@ -13,6 +13,7 @@ export interface ParsedQuestion {
   points: number
   display_order: number
   question_type: 'multiple_choice' | 'open_text'
+  section_title?: string
   answer_options: ParsedAnswerOption[]
 }
 
@@ -59,6 +60,7 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
   result.description = descLines.join(' ').trim()
 
   // Parse questions
+  let currentSection: string | undefined = undefined
   let currentQuestion: (Omit<ParsedQuestion, 'display_order'> & { display_order: number }) | null = null
 
   const flushQuestion = () => {
@@ -79,6 +81,11 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
     const line = raw.trim()
     i++
 
+    if (line.startsWith('### ')) {
+      currentSection = line.slice(4).trim() || undefined
+      continue
+    }
+
     if (line.startsWith('## ')) {
       flushQuestion()
       currentQuestion = {
@@ -88,6 +95,7 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
         points: DEFAULT_POINTS,
         display_order: 0,
         question_type: 'multiple_choice',
+        section_title: currentSection,
         answer_options: [],
       }
       continue

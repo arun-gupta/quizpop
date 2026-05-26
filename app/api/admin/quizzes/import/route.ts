@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
           points: q.points,
           display_order: q.display_order,
           question_type: q.question_type ?? 'multiple_choice',
+          section_title: q.section_title ?? null,
         })
         .select()
         .single()
