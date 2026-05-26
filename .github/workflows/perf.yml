@@ -143,10 +143,13 @@ jobs:
           git fetch origin gh-pages
           git checkout gh-pages
 
+          # Tell Vercel not to build this branch
+          echo '{"buildCommand":null,"installCommand":null,"framework":null}' > vercel.json
+
           mkdir -p dev/bench
           cp /tmp/perf-report.html dev/bench/index.html
 
-          git add dev/bench/index.html
+          git add vercel.json dev/bench/index.html
           # Only commit if there are changes (file may be identical across runs)
           git diff --cached --quiet || git commit -m "chore: update perf dashboard [skip ci]"
           git push origin gh-pages
