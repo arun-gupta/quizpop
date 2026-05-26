@@ -31,20 +31,6 @@ How well do you know Mihir — and the world he was born into?
 - [ ] Boom Boom Pow – Black Eyed Peas
 - [ ] Single Ladies – Beyoncé
 
-### In 2008, which sports legend won 8 gold medals at the Beijing Olympics?
-> timer: 20 | points: 1000
-- [ ] Usain Bolt
-- [x] Michael Phelps
-- [ ] Roger Federer
-- [ ] LeBron James
-
-### Which game dominated Mihir's generation more than any other?
-> timer: 20 | points: 1000
-- [ ] Minecraft
-- [ ] Roblox
-- [x] Fortnite
-- [ ] Among Us
-
 ### Which technology did NOT exist when Mihir was born in 2008?
 > timer: 20 | points: 1000
 - [ ] YouTube
@@ -52,14 +38,7 @@ How well do you know Mihir — and the world he was born into?
 - [x] iPad
 - [ ] Gmail
 
-### Finish the lyric: Mihir's generation grew up hearing "We found love in a _____ place"
-> timer: 15 | points: 500
-- [ ] Sunny
-- [ ] Strange
-- [x] Hopeless
-- [ ] Lonely
-
-### How many days old is Mihir turning 18 today (exactly)?
+### How many days old is Mihir turning 18 (exactly)?
 > timer: 20 | points: 2000
 - [ ] 4,500
 - [ ] 5,840
@@ -77,10 +56,10 @@ How well do you know Mihir — and the world he was born into?
 
 ### As a kid, most of Mihir's photos are on whose shoulder?
 > timer: 20 | points: 1000
-- [ ] Arun
-- [ ] Grandpa
-- [ ] Aditya
-- [x] Varun
+- [ ] His Dad
+- [ ] His Grandpa
+- [ ] His elder brother, Aditya
+- [x] His cousin, Varun
 
 ### As a kid, what was Mihir's favourite animated movie?
 > timer: 15 | points: 1000
@@ -93,7 +72,7 @@ How well do you know Mihir — and the world he was born into?
 > timer: 20 | points: 1000
 - [ ] Hawaii
 - [ ] Kilimanjaro
-- [ ] London
+- [ ] India
 - [x] Disneyland
 
 ### At what age did Mihir earn his Taekwondo black belt?
@@ -105,7 +84,7 @@ How well do you know Mihir — and the world he was born into?
 
 ## High School Years
 
-### What sports did Mihir play in high school?
+### What all sports did Mihir play in high school?
 > type: open_text | timer: 30 | points: 500
 
 ### What activity consumed the most of Mihir's time in high school?
@@ -119,7 +98,7 @@ How well do you know Mihir — and the world he was born into?
 > timer: 15 | points: 500
 - [ ] English
 - [ ] History
-- [x] Math
+- [x] Mathematics
 - [ ] Biology
 
 ### Which subject did Mihir surprisingly enjoy?
@@ -146,7 +125,7 @@ How well do you know Mihir — and the world he was born into?
 - [x] 0 — straight up, no snooze
 - [ ] 3
 - [ ] 5
-- [ ] "I don't use an alarm"
+- [ ] Mom is his alarm
 
 ### Which app has the highest screen time on Mihir's phone?
 > timer: 15 | points: 1000
@@ -157,9 +136,9 @@ How well do you know Mihir — and the world he was born into?
 
 ### What is Mihir's comfort food?
 > timer: 15 | points: 500
-- [ ] Pizza
+- [X] Pizza
 - [ ] Biryani
-- [x] Dosa
+- [ ] Dosa
 - [ ] Pasta
 
 ### What's the one food or drink Mihir could have every single day?
@@ -202,7 +181,7 @@ How well do you know Mihir — and the world he was born into?
 ### During a family trip, what role does Mihir usually play?
 > timer: 20 | points: 1000
 - [ ] Trip planner
-- [ ] DJ
+- [ ] Entertainer
 - [x] Sleeper in the back seat
 - [ ] Professional snack manager
 
@@ -239,7 +218,7 @@ How well do you know Mihir — and the world he was born into?
 ### What's one word that best describes Mihir?
 > type: open_text | timer: 30 | points: 500
 
-### What is your favourite memory with Mihir?
+### What is your favourite memory with Mihir (3-5 words)?
 > type: open_text | timer: 30 | points: 500
 
 ### What do you think Mihir will be doing in 10 years?

@@ -115,10 +115,10 @@ async function startGame(gameId: string, hostToken: string) {
 
 async function getFirstAnswerId(gameId: string): Promise<string> {
   const { ok, data } = await get(`/api/game/${gameId}/state`)
-  if (!ok) throw new Error('Failed to fetch game state')
+  if (!ok) throw new Error(`Failed to fetch game state: ${JSON.stringify(data)}`)
   const q = (data as { question?: { answer_options: { id: string }[] } }).question
   const answerId = q?.answer_options?.[0]?.id
-  if (!answerId) throw new Error('No answer options in state response')
+  if (!answerId) throw new Error(`No answer options in state response — game_state=${(data as {session?: {game_state?: string}}).session?.game_state}, question=${JSON.stringify(q)}`)
   return answerId
 }
 
