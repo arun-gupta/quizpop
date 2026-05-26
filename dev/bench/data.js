@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779754946345,
+  "lastUpdate": 1779754982364,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -381,6 +381,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3014,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "84b563cf0689ec7b25e4d94e41e2570b8ab26756",
+          "message": "Bump GitHub Actions to Node.js 24-compatible versions\n\nactions/checkout@v4.2.2, setup-node@v4.4.0, upload-artifact@v4.6.2\nRequired before June 2 2026 when GitHub moves runners to Node.js 24.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-25T17:21:57-07:00",
+          "tree_id": "4ac43df77a646e5e796e9eda9112b3ca8d0d0c96",
+          "url": "https://github.com/arun-gupta/quizpop/commit/84b563cf0689ec7b25e4d94e41e2570b8ab26756"
+        },
+        "date": 1779754981593,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1648,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 1906,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1429,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 1587,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1642,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1900,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 1860,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 2916,
             "unit": "ms"
           }
         ]
