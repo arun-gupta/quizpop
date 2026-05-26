@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779773672826,
+  "lastUpdate": 1779773775575,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -957,6 +957,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3450,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "5899afee79f88044d0f2454710562f796a92cf39",
+          "message": "fix: constrain results/leaderboard screens to viewport height\n\nApply h-screen overflow-hidden to HostResults, PlayerResults, and\nHostLeaderboard. Reduce reveal image to h-40. Add overflow-y-auto\nto scrollable content areas so nothing gets cut off.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-25T22:35:13-07:00",
+          "tree_id": "6f29cf69e432dfcf9890b57017e4661774c1254d",
+          "url": "https://github.com/arun-gupta/quizpop/commit/5899afee79f88044d0f2454710562f796a92cf39"
+        },
+        "date": 1779773775279,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1602,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 1914,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1641,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2333,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1600,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1839,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2388,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 2758,
             "unit": "ms"
           }
         ]
