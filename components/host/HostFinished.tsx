@@ -10,77 +10,136 @@ interface HostFinishedProps {
   session: GameSession
 }
 
+interface PodiumSpotProps {
+  entry: LeaderboardEntry
+  place: 1 | 2 | 3
+  animationDelay: string
+}
+
+function PodiumSpot({ entry, place, animationDelay }: PodiumSpotProps) {
+  const configs = {
+    1: {
+      medal: '🥇',
+      platformHeight: 'h-28',
+      platformColor: 'bg-yellow-500/80 border-yellow-400/60',
+      avatarSize: 'w-20 h-20 text-3xl',
+      nameColor: 'text-yellow-300',
+      scoreColor: 'text-yellow-400/80',
+      fontSize: 'text-base',
+      medalSize: 'text-5xl',
+      numberSize: 'text-3xl',
+      platformWidth: 'w-28',
+    },
+    2: {
+      medal: '🥈',
+      platformHeight: 'h-20',
+      platformColor: 'bg-slate-400/80 border-slate-300/60',
+      avatarSize: 'w-16 h-16 text-2xl',
+      nameColor: 'text-white',
+      scoreColor: 'text-white/60',
+      fontSize: 'text-sm',
+      medalSize: 'text-4xl',
+      numberSize: 'text-2xl',
+      platformWidth: 'w-24',
+    },
+    3: {
+      medal: '🥉',
+      platformHeight: 'h-12',
+      platformColor: 'bg-amber-700/80 border-amber-600/60',
+      avatarSize: 'w-14 h-14 text-xl',
+      nameColor: 'text-white',
+      scoreColor: 'text-white/60',
+      fontSize: 'text-sm',
+      medalSize: 'text-3xl',
+      numberSize: 'text-xl',
+      platformWidth: 'w-20',
+    },
+  }
+  const c = configs[place]
+
+  return (
+    <div
+      className="flex flex-col items-center"
+      style={{ animation: `podiumRise 0.6s cubic-bezier(0.34,1.56,0.64,1) ${animationDelay} both` }}
+    >
+      <div className={`${c.medalSize} mb-1`}>{c.medal}</div>
+      <div
+        className={`${c.avatarSize} rounded-full flex items-center justify-center font-extrabold text-white shadow-xl mb-1`}
+        style={{ backgroundColor: entry.avatar_color }}
+      >
+        {entry.display_name.charAt(0).toUpperCase()}
+      </div>
+      <p className={`${c.nameColor} font-extrabold ${c.fontSize} text-center mb-0.5 max-w-[100px] truncate`}>
+        {entry.display_name}
+      </p>
+      <p className={`${c.scoreColor} text-xs mb-2 font-semibold`}>
+        {entry.total_score.toLocaleString()} pts
+      </p>
+      <div
+        className={`${c.platformWidth} ${c.platformHeight} ${c.platformColor} border rounded-t-xl flex items-center justify-center`}
+      >
+        <span className={`text-white font-extrabold ${c.numberSize}`}>{place}</span>
+      </div>
+    </div>
+  )
+}
+
 export default function HostFinished({ entries, session }: HostFinishedProps) {
   const router = useRouter()
-  const winner = entries[0] ?? null
-  const totalPlayers = entries.length
+  const [first, second, third] = [entries[0] ?? null, entries[1] ?? null, entries[2] ?? null]
+  const rest = entries.slice(3)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       <Confetti />
 
       {/* Header */}
-      <div className="text-center pt-10 pb-4 px-8">
-        <h1
-          className="text-6xl font-extrabold text-white tracking-wide drop-shadow-2xl"
-          style={{ animation: 'zoomIn 0.6s ease-out both' }}
-        >
+      <div
+        className="text-center pt-10 pb-4 px-8"
+        style={{ animation: 'fadeInDown 0.5s ease-out both' }}
+      >
+        <h1 className="text-6xl font-extrabold text-white tracking-wide drop-shadow-2xl">
           🎉 GAME OVER! 🎉
         </h1>
+        <p className="text-white/50 text-lg mt-1">
+          {entries.length} player{entries.length !== 1 ? 's' : ''} · {session.current_question_index + 1} questions
+        </p>
       </div>
 
-      {/* Winner spotlight */}
-      {winner && (
-        <div
-          className="mx-auto max-w-lg w-full px-8 mb-6"
-          style={{ animation: 'zoomIn 0.7s ease-out 0.2s both' }}
-        >
-          <div className="bg-gradient-to-br from-yellow-400/30 to-orange-400/20 rounded-3xl p-6 border-2 border-yellow-400/60 shadow-2xl text-center">
-            <div className="text-5xl mb-2">🥇</div>
-            <div
-              className="w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl font-extrabold text-white shadow-xl"
-              style={{ backgroundColor: winner.avatar_color }}
-            >
-              {winner.display_name.charAt(0).toUpperCase()}
-            </div>
-            <p className="text-yellow-300 text-4xl font-extrabold mb-1">
-              {winner.display_name}
-            </p>
-            <p className="text-white/70 text-xl">
-              <span className="text-yellow-300 font-extrabold text-3xl">
-                {winner.total_score.toLocaleString()}
-              </span>{' '}
-              points
-            </p>
-            <p className="text-yellow-400 text-2xl font-bold mt-2">WINNER!</p>
-          </div>
+      {/* Podium */}
+      <div className="flex items-end justify-center gap-3 px-8 mt-4 mb-2">
+        {/* 2nd — left */}
+        {second ? (
+          <PodiumSpot entry={second} place={2} animationDelay="0.9s" />
+        ) : (
+          <div className="w-24" />
+        )}
+
+        {/* 1st — centre, tallest, last to animate */}
+        {first && (
+          <PodiumSpot entry={first} place={1} animationDelay="1.5s" />
+        )}
+
+        {/* 3rd — right, first to animate */}
+        {third ? (
+          <PodiumSpot entry={third} place={3} animationDelay="0.3s" />
+        ) : (
+          <div className="w-20" />
+        )}
+      </div>
+
+      {/* Rest of leaderboard (4th+) */}
+      {rest.length > 0 && (
+        <div className="px-8 max-w-2xl mx-auto w-full mt-6">
+          <h2 className="text-white/40 text-sm font-semibold uppercase tracking-widest text-center mb-3">
+            Also Played
+          </h2>
+          <Leaderboard entries={rest} showTop={rest.length} />
         </div>
       )}
 
-      {/* Stats */}
-      <div className="flex justify-center gap-8 px-8 mb-4">
-        <div className="bg-white/10 rounded-2xl px-6 py-3 text-center">
-          <p className="text-white font-extrabold text-2xl">{totalPlayers}</p>
-          <p className="text-white/50 text-sm">Players</p>
-        </div>
-        <div className="bg-white/10 rounded-2xl px-6 py-3 text-center">
-          <p className="text-white font-extrabold text-2xl">
-            {session.current_question_index}
-          </p>
-          <p className="text-white/50 text-sm">Questions</p>
-        </div>
-      </div>
-
-      {/* Leaderboard */}
-      <div className="flex-1 px-8 max-w-3xl mx-auto w-full overflow-y-auto">
-        <h2 className="text-white/60 text-lg font-semibold uppercase tracking-widest text-center mb-3">
-          Final Standings
-        </h2>
-        <Leaderboard entries={entries} showTop={10} />
-      </div>
-
       {/* Play Again */}
-      <div className="px-8 py-8 flex justify-center">
+      <div className="px-8 py-8 flex justify-center mt-auto">
         <button
           onClick={() => router.push('/host')}
           className="px-12 py-5 rounded-2xl text-white text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-violet-400 hover:from-purple-400 hover:to-violet-300 hover:scale-105 active:scale-95 transition-all duration-200 shadow-2xl cursor-pointer"
@@ -90,9 +149,13 @@ export default function HostFinished({ entries, session }: HostFinishedProps) {
       </div>
 
       <style jsx>{`
-        @keyframes zoomIn {
-          from { opacity: 0; transform: scale(0.7); }
-          to { opacity: 1; transform: scale(1); }
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateY(-30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes podiumRise {
+          from { opacity: 0; transform: translateY(60px) scale(0.8); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </div>
