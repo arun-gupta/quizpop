@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779813525419,
+  "lastUpdate": 1779813926266,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -1277,6 +1277,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 2693,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "4f6f061fa7e7349e4a198a39ff7261a757569850",
+          "message": "feat: categorize game sessions as Active / Stale / Past\n\n- Live Games page now shows all sessions split into three sections:\n  Active (non-finished, <2h old), Stale (non-finished, >=2h old),\n  Past (finished). Stale section has a Force End All button.\n- Load test now calls finish action after each test run so CI games\n  don't accumulate as stale sessions.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T09:44:19-07:00",
+          "tree_id": "3ac4e844e4930b020880b34e68e9cc07ebae8f50",
+          "url": "https://github.com/arun-gupta/quizpop/commit/4f6f061fa7e7349e4a198a39ff7261a757569850"
+        },
+        "date": 1779813925892,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1880,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2243,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 2003,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2860,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1739,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1953,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2139,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3223,
             "unit": "ms"
           }
         ]
