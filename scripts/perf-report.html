@@ -21,7 +21,9 @@
 
     /* Summary cards */
     .section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #7c3aed; margin-bottom: 0.75rem; margin-top: 2rem; }
-    .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 0.5rem; }
+    .card-group { margin-bottom: 1.2rem; }
+    .card-group-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7280; margin-bottom: 0.5rem; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
     .card { background: #1a0f35; border: 1px solid #2d1b6b; border-radius: 12px; padding: 1.1rem 1.3rem; }
     .card .label { font-size: 0.72rem; color: #9ca3af; font-weight: 600; margin-bottom: 0.4rem; }
     .card .value { font-size: 2rem; font-weight: 900; color: #fff; line-height: 1; }
@@ -47,7 +49,7 @@
     .pass { color: #34d399; font-weight: 700; }
     .fail { color: #f87171; font-weight: 700; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
       .charts { grid-template-columns: 1fr; }
       .cards  { grid-template-columns: 1fr 1fr; }
     }
@@ -69,7 +71,14 @@
 
   <!-- Trend summary cards -->
   <div class="section-title">Latest run — trend vs previous</div>
-  <div class="cards" id="cards"></div>
+  <div class="card-group">
+    <div class="card-group-label">50 players</div>
+    <div class="cards" id="cards-50"></div>
+  </div>
+  <div class="card-group">
+    <div class="card-group-label">100 players</div>
+    <div class="cards" id="cards-100"></div>
+  </div>
 
   <!-- Charts -->
   <div class="section-title" style="margin-top:2.5rem">History per metric</div>
@@ -116,33 +125,45 @@
       : { cls: 'down', icon: '↓', delta: pct.toFixed(1) + '%' }
   }
 
-  const METRICS = [
-    { key: 'join_p50 (50 players)',   label: 'Join p50',   sub: '50 players' },
-    { key: 'join_p95 (50 players)',   label: 'Join p95',   sub: '50 players' },
-    { key: 'answer_p50 (50 players)', label: 'Answer p50', sub: '50 players' },
-    { key: 'answer_p95 (50 players)', label: 'Answer p95', sub: '50 players' },
-    { key: 'join_p50 (100 players)',  label: 'Join p50',   sub: '100 players' },
-    { key: 'join_p95 (100 players)',  label: 'Join p95',   sub: '100 players' },
-    { key: 'answer_p50 (100 players)',label: 'Answer p50', sub: '100 players' },
-    { key: 'answer_p95 (100 players)',label: 'Answer p95', sub: '100 players' },
+  const METRIC_ROWS = [
+    {
+      id: 'cards-50',
+      metrics: [
+        { key: 'join_p50 (50 players)',   label: 'Join p50'   },
+        { key: 'join_p95 (50 players)',   label: 'Join p95'   },
+        { key: 'answer_p50 (50 players)', label: 'Answer p50' },
+        { key: 'answer_p95 (50 players)', label: 'Answer p95' },
+      ],
+    },
+    {
+      id: 'cards-100',
+      metrics: [
+        { key: 'join_p50 (100 players)',  label: 'Join p50'   },
+        { key: 'join_p95 (100 players)',  label: 'Join p95'   },
+        { key: 'answer_p50 (100 players)',label: 'Answer p50' },
+        { key: 'answer_p95 (100 players)',label: 'Answer p95' },
+      ],
+    },
   ]
 
   const latest = suite[suite.length - 1]
   const prev   = suite[suite.length - 2] ?? null
 
   // ── Summary cards ─────────────────────────────────────────────────────────
-  const cardsEl = document.getElementById('cards')
-  METRICS.forEach(m => {
-    const curr = getBench(latest, m.key)
-    const p    = prev ? getBench(prev, m.key) : null
-    if (curr == null) return
-    const t = trendIcon(curr, p)
-    cardsEl.innerHTML += `
-      <div class="card">
-        <div class="label">${m.label} · ${m.sub}</div>
-        <div class="value">${curr}<span class="unit">ms</span></div>
-        <div class="trend ${t.cls}">${t.icon} ${t.delta || '—'} ${p != null ? 'vs ' + p + 'ms' : 'first run'}</div>
-      </div>`
+  METRIC_ROWS.forEach(row => {
+    const el = document.getElementById(row.id)
+    row.metrics.forEach(m => {
+      const curr = getBench(latest, m.key)
+      const p    = prev ? getBench(prev, m.key) : null
+      if (curr == null) return
+      const t = trendIcon(curr, p)
+      el.innerHTML += `
+        <div class="card">
+          <div class="label">${m.label}</div>
+          <div class="value">${curr}<span class="unit">ms</span></div>
+          <div class="trend ${t.cls}">${t.icon} ${t.delta || '—'} ${p != null ? 'vs ' + p + 'ms' : 'first run'}</div>
+        </div>`
+    })
   })
 
   // ── Charts ────────────────────────────────────────────────────────────────
