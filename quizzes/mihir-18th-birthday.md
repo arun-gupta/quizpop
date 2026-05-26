@@ -59,34 +59,27 @@ How well do you know Mihir — and the world he was born into?
 - [x] Hopeless
 - [ ] Lonely
 
-### How many days old is Mihir turning 18 today (approximately)?
+### How many days old is Mihir turning 18 today (exactly)?
 > timer: 20 | points: 2000
 - [ ] 4,500
 - [ ] 5,840
 - [x] 6,570
 - [ ] 7,300
 
-### If Mihir had invested $1,000 in Bitcoin when it launched in 2009, roughly what would it be worth today?
-> timer: 30 | points: 2000
-- [ ] $1 million
-- [ ] $100 million
-- [ ] $1 billion
-- [x] Over $100 billion
-
 ## Growing Up
 
 ### What was Mihir's first school?
 > timer: 20 | points: 1000
-- [ ] Sunrise Academy
-- [ ] Greenwood School
+- [ ] Challenger Academy
+- [ ] Country Lane
 - [x] Champion
-- [ ] Riverside School
+- [ ] Easterbrook Discovery
 
 ### As a kid, most of Mihir's photos are on whose shoulder?
 > timer: 20 | points: 1000
 - [ ] Arun
 - [ ] Grandpa
-- [ ] Sunita
+- [ ] Aditya
 - [x] Varun
 
 ### As a kid, what was Mihir's favourite animated movie?
@@ -99,7 +92,7 @@ How well do you know Mihir — and the world he was born into?
 ### Which family vacation destination did Mihir enjoy the most?
 > timer: 20 | points: 1000
 - [ ] Hawaii
-- [ ] Dubai
+- [ ] Kilimanjaro
 - [ ] London
 - [x] Disneyland
 
@@ -107,8 +100,8 @@ How well do you know Mihir — and the world he was born into?
 > timer: 15 | points: 1000
 - [ ] 9
 - [x] 11
+- [ ] 12
 - [ ] 13
-- [ ] 15
 
 ## High School Years
 
@@ -118,8 +111,8 @@ How well do you know Mihir — and the world he was born into?
 ### What activity consumed the most of Mihir's time in high school?
 > timer: 20 | points: 1000
 - [ ] Gaming
-- [ ] Studying
-- [x] Basketball
+- [x] Scouting
+- [ ] Basketball
 - [ ] Scrolling Instagram
 
 ### Which subject did Mihir enjoy the most in high school?
@@ -154,13 +147,6 @@ How well do you know Mihir — and the world he was born into?
 - [ ] 3
 - [ ] 5
 - [ ] "I don't use an alarm"
-
-### What's a phrase Mihir says all the time?
-> timer: 20 | points: 1000
-- [ ] "That's lowkey fire"
-- [ ] "No cap"
-- [x] "Treat your body like a temple"
-- [ ] "It is what it is"
 
 ### Which app has the highest screen time on Mihir's phone?
 > timer: 15 | points: 1000
@@ -231,7 +217,7 @@ How well do you know Mihir — and the world he was born into?
 
 ### What's Mihir's dream career?
 > timer: 20 | points: 1000
-- [ ] Doctor
+- [ ] Financial analyst
 - [ ] Software engineer
 - [ ] Entrepreneur
 - [x] Investment banker
@@ -242,10 +228,10 @@ How well do you know Mihir — and the world he was born into?
 ## Open Mic
 
 ### What happened 5 minutes before the iconic Joshua Tree photo?
-> type: open_text | timer: 40 | points: 500
+> type: open_text | timer: 30 | points: 500
 
 ### Which song best describes Mihir's personality?
-> type: open_text | timer: 40 | points: 500
+> type: open_text | timer: 30 | points: 500
 
 ### What is Mihir's most repeated phrase or text reply?
 > type: open_text | timer: 30 | points: 500
@@ -254,7 +240,7 @@ How well do you know Mihir — and the world he was born into?
 > type: open_text | timer: 30 | points: 500
 
 ### What is your favourite memory with Mihir?
-> type: open_text | timer: 45 | points: 500
+> type: open_text | timer: 30 | points: 500
 
 ### What do you think Mihir will be doing in 10 years?
-> type: open_text | timer: 40 | points: 500
+> type: open_text | timer: 30 | points: 500
