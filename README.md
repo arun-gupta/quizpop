@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/quizpop-logo.png" width="120" alt="QuizPop logo" />
+</p>
+
 # QuizPop 🎉
 
 > Kahoot-style multiplayer quiz game for parties and events — no app download required.
