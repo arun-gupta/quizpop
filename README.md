@@ -2,11 +2,11 @@
 
 > The fast, fun, multiplayer quiz game for parties and events — no app download required!
 
-[![Production App](https://img.shields.io/badge/Production_App-quizpop--arungupta.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app)
-[![Vercel Deployments](https://img.shields.io/badge/Vercel-Deployments-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/arun-gupta-5985s-projects/quizpop/deployments)
-[![Supabase Dashboard](https://img.shields.io/badge/Supabase-Dashboard-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/dashboard/project/kttofycsvcjmwpxamjwa)
-[![Perf Dashboard](https://img.shields.io/badge/Perf-Dashboard-4493F8?style=for-the-badge&logo=github&logoColor=white)](https://arun-gupta.github.io/quizpop/dev/bench/)
-[![Admin Panel](https://img.shields.io/badge/Admin-Panel-7C3AED?style=for-the-badge&logo=shield&logoColor=white)](https://quizpop-arungupta.vercel.app/admin)
+[![Production](https://img.shields.io/badge/Production-Live-00C7B7?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployments-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/arun-gupta-5985s-projects/quizpop/deployments)
+[![Supabase](https://img.shields.io/badge/Supabase-Dashboard-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/dashboard/project/kttofycsvcjmwpxamjwa)
+[![Perf](https://img.shields.io/badge/Perf-Dashboard-4493F8?style=for-the-badge&logo=githubactions&logoColor=white)](https://arun-gupta.github.io/quizpop/dev/bench/)
+[![Admin](https://img.shields.io/badge/Admin-Panel-7C3AED?style=for-the-badge&logo=vercel&logoColor=white)](https://quizpop-arungupta.vercel.app/admin)
 
 QuizPop is a Kahoot-style party quiz game built with Next.js 15 and Supabase Realtime. A host creates a game room, players join with a 6-letter code on any device, and everyone battles for quiz glory in real time.
 
