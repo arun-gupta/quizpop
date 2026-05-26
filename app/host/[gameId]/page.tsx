@@ -27,7 +27,7 @@ export default function HostGamePage() {
   const [question, setQuestion] = useState<PublicQuestion | null>(null)
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [hostToken, setHostToken] = useState<string>('')
-  const [responseCount, setResponseCount] = useState(0)
+  const [respondedPlayerIds, setRespondedPlayerIds] = useState<Set<string>>(new Set())
   const [answerDistribution, setAnswerDistribution] = useState<Record<string, number>>({})
   const [wordCloud, setWordCloud] = useState<WordCloudEntry[] | null>(null)
   const [totalQuestions, setTotalQuestions] = useState(0)
@@ -70,7 +70,7 @@ export default function HostGamePage() {
       // Reset response counters only when the question changes
       if (newQuestion?.id !== currentQuestionIdRef.current) {
         currentQuestionIdRef.current = newQuestion?.id ?? null
-        setResponseCount(0)
+        setRespondedPlayerIds(new Set())
         setAnswerDistribution({})
         setWordCloud(null)
       }
@@ -131,8 +131,8 @@ export default function HostGamePage() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'player_responses' },
         (payload) => {
-          const response = payload.new as { selected_answer_id: string | null; free_text_response: string | null }
-          setResponseCount((prev) => prev + 1)
+          const response = payload.new as { player_id: string; selected_answer_id: string | null; free_text_response: string | null }
+          setRespondedPlayerIds((prev) => new Set([...prev, response.player_id]))
           if (response.selected_answer_id) {
             setAnswerDistribution((prev) => ({
               ...prev,
@@ -265,7 +265,7 @@ export default function HostGamePage() {
         <HostQuestion
           question={question}
           players={players}
-          responses={responseCount}
+          responses={respondedPlayerIds.size}
           questionStartedAt={session.question_started_at}
           wordCloud={wordCloud}
         />
