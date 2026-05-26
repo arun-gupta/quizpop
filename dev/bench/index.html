@@ -157,12 +157,12 @@
       const p    = prev ? getBench(prev, m.key) : null
       if (curr == null) return
       const t = trendIcon(curr, p)
-      el.innerHTML += `
+      el.insertAdjacentHTML('beforeend', `
         <div class="card">
           <div class="label">${m.label}</div>
           <div class="value">${curr}<span class="unit">ms</span></div>
           <div class="trend ${t.cls}">${t.icon} ${t.delta || '—'} ${p != null ? 'vs ' + p + 'ms' : 'first run'}</div>
-        </div>`
+        </div>`)
     })
   })
 
@@ -182,7 +182,7 @@
 
   BASE_METRICS.forEach((bm, ci) => {
     const id = 'chart-' + bm.base
-    chartsEl.innerHTML += `<div class="chart-box"><h3>${bm.title}</h3><canvas id="${id}"></canvas></div>`
+    chartsEl.insertAdjacentHTML('beforeend', `<div class="chart-box"><h3>${bm.title}</h3><canvas id="${id}"></canvas></div>`)
 
     const datasets = ['50 players', '100 players'].map((players, pi) => ({
       label: players,
@@ -227,7 +227,7 @@
     const jp95 = getBench(r, 'join_p95 (50 players)')
     const ap50 = getBench(r, 'answer_p50 (50 players)')
     const ap95 = getBench(r, 'answer_p95 (50 players)')
-    logEl.innerHTML += `
+    logEl.insertAdjacentHTML('beforeend', `
       <tr>
         <td><a class="sha" href="${r.commit.url}" target="_blank">${shortSha(r.commit.id)}</a></td>
         <td>${r.commit.message.slice(0, 60)}${r.commit.message.length > 60 ? '…' : ''}</td>
