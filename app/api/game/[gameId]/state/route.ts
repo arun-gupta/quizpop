@@ -395,6 +395,7 @@ export async function GET(
       question,
       players: players ?? [],
       playerCount: players?.length ?? 0,
+      totalQuestions: questions?.length ?? 0,
       leaderboard,
       correctAnswerId,
       wordCloud,

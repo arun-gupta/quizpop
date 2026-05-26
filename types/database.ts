@@ -148,6 +148,7 @@ export interface GameStateResponse {
   question: PublicQuestion | null
   players: Player[]
   playerCount: number
+  totalQuestions: number
   leaderboard: LeaderboardEntry[] | null
   correctAnswerId: string | null
   wordCloud: WordCloudEntry[] | null

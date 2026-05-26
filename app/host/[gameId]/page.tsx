@@ -30,6 +30,7 @@ export default function HostGamePage() {
   const [responseCount, setResponseCount] = useState(0)
   const [answerDistribution, setAnswerDistribution] = useState<Record<string, number>>({})
   const [wordCloud, setWordCloud] = useState<WordCloudEntry[] | null>(null)
+  const [totalQuestions, setTotalQuestions] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
@@ -75,6 +76,7 @@ export default function HostGamePage() {
       }
       setQuestion(newQuestion)
       setLeaderboard(data.leaderboard ?? [])
+      if (data.totalQuestions) setTotalQuestions(data.totalQuestions)
       if (data.wordCloud) setWordCloud(data.wordCloud)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load game')
@@ -288,6 +290,7 @@ export default function HostGamePage() {
         <HostLeaderboard
           entries={leaderboard}
           autoAdvanceSecs={8}
+          isLastQuestion={totalQuestions > 0 && session.current_question_index >= totalQuestions - 1}
         />
       )
       break

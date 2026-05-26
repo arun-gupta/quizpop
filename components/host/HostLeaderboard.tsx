@@ -7,11 +7,13 @@ import Leaderboard from '@/components/game/Leaderboard'
 interface HostLeaderboardProps {
   entries: LeaderboardEntry[]
   autoAdvanceSecs?: number
+  isLastQuestion?: boolean
 }
 
 export default function HostLeaderboard({
   entries,
   autoAdvanceSecs = 8,
+  isLastQuestion = false,
 }: HostLeaderboardProps) {
   const [countdown, setCountdown] = useState(autoAdvanceSecs)
 
@@ -49,7 +51,7 @@ export default function HostLeaderboard({
       {/* Auto-advance countdown */}
       <div className="px-8 py-8 flex flex-col items-center gap-2">
         <p className="text-white/40 text-sm font-semibold">
-          Next question in {countdown}s…
+          {isLastQuestion ? `Game ending in ${countdown}s…` : `Next question in ${countdown}s…`}
         </p>
       </div>
 
