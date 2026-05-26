@@ -39,4 +39,4 @@ supabase/.branches
 supabase/.temp
 
 # quiz files with personal content (import via admin panel instead)
-quizzes/
+/quizzes/

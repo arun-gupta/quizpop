@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Upload, FileText, AlertCircle, CheckCircle, AlertTriangle, X, Copy } from 'lucide-react'
+import { Upload, FileText, AlertCircle, CheckCircle, AlertTriangle, X, Copy, Database } from 'lucide-react'
 import { parseQuizMarkdown, generateExampleMarkdown } from '@/lib/quiz-markdown'
 import type { ParsedQuiz } from '@/lib/quiz-markdown'
 
@@ -14,7 +14,10 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
   const [markdown, setMarkdown] = useState('')
   const [preview, setPreview] = useState<ParsedQuiz | null>(null)
   const [importing, setImporting] = useState(false)
-  const [tab, setTab] = useState<'paste' | 'upload' | 'format'>('paste')
+  const [tab, setTab] = useState<'paste' | 'upload' | 'bucket' | 'format'>('paste')
+  const [bucketPath, setBucketPath] = useState('')
+  const [fetching, setFetching] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const handlePreview = () => {
@@ -51,6 +54,29 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
     }
   }
 
+  const handleFetchFromBucket = async () => {
+    if (!bucketPath.trim()) return
+    setFetching(true)
+    setFetchError(null)
+    try {
+      const res = await fetch('/api/admin/quizzes/fetch-from-bucket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bucketPath: bucketPath.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setFetchError(data.error ?? 'Failed to fetch from bucket')
+        return
+      }
+      setMarkdown(data.markdown)
+      setPreview(parseQuizMarkdown(data.markdown))
+      setTab('paste')
+    } finally {
+      setFetching(false)
+    }
+  }
+
   const loadExample = () => {
     const example = generateExampleMarkdown()
     setMarkdown(example)
@@ -62,7 +88,7 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
     <div className="flex flex-col h-full">
       {/* Tabs */}
       <div className="flex border-b border-gray-700 mb-4">
-        {(['paste', 'upload', 'format'] as const).map(t => (
+        {(['paste', 'upload', 'bucket', 'format'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -72,7 +98,7 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
                 : 'text-gray-400 hover:text-gray-200'
             }`}
           >
-            {t === 'paste' ? 'Paste Markdown' : t === 'upload' ? 'Upload File' : 'Format Guide'}
+            {t === 'paste' ? 'Paste Markdown' : t === 'upload' ? 'Upload File' : t === 'bucket' ? 'From Storage' : 'Format Guide'}
           </button>
         ))}
       </div>
@@ -111,6 +137,57 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
             <Upload size={40} className="text-gray-500" />
             <p className="text-gray-300 font-medium">Click to upload a .md file</p>
             <p className="text-gray-500 text-sm">or drag and drop</p>
+          </div>
+        </div>
+      )}
+
+      {tab === 'bucket' && (
+        <div className="flex-1 flex flex-col gap-4">
+          <div className="space-y-1">
+            <p className="text-sm text-gray-400">
+              Upload your <code className="text-purple-400">.md</code> file and images into the same Supabase Storage folder, then enter the path below.
+            </p>
+            <p className="text-xs text-gray-500">
+              Format: <code className="text-gray-300">bucket-name/folder</code> — e.g. <code className="text-gray-300">quiz-images/mihir</code>
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={bucketPath}
+              onChange={e => { setBucketPath(e.target.value); setFetchError(null) }}
+              onKeyDown={e => e.key === 'Enter' && handleFetchFromBucket()}
+              placeholder="quiz-images/my-folder"
+              className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-100 font-mono focus:outline-none focus:border-purple-500 placeholder:text-gray-600"
+            />
+            <button
+              onClick={handleFetchFromBucket}
+              disabled={!bucketPath.trim() || fetching}
+              className="px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-colors flex items-center gap-2"
+            >
+              {fetching ? (
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Database size={15} />
+              )}
+              {fetching ? 'Fetching…' : 'Fetch'}
+            </button>
+          </div>
+          {fetchError && (
+            <div className="flex items-start gap-2 bg-red-900/30 border border-red-700 rounded-lg p-3">
+              <AlertCircle size={15} className="text-red-400 mt-0.5 shrink-0" />
+              <p className="text-red-300 text-sm">{fetchError}</p>
+            </div>
+          )}
+          <div className="bg-gray-800/60 rounded-lg p-4 text-xs text-gray-400 space-y-2">
+            <p className="font-medium text-gray-300">Bucket folder structure:</p>
+            <pre className="font-mono leading-relaxed">{`quiz-images/
+└── mihir/
+    ├── mihir-18th-birthday.md   ← quiz markdown
+    ├── baby.jpeg
+    ├── school.jpeg
+    └── ...`}</pre>
+            <p>The <code className="text-gray-300">.md</code> file must have <code className="text-purple-400">{`> bucket: quiz-images/mihir`}</code> at the top so image paths resolve correctly.</p>
           </div>
         </div>
       )}
