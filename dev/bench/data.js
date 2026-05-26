@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779825740687,
+  "lastUpdate": 1779826004162,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -2109,6 +2109,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3345,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "73175aa7ccfd2ba0a0c5d46af5379d532dd6b3c5",
+          "message": "Add animated podium to game over screen\n\n3rd place rises first (0.3s), then 2nd (0.9s), then 1st (1.5s) with a\nspring bounce. Layout: 2nd left · 1st centre (tallest) · 3rd right.\nRanks 4+ shown below as \"Also Played\".\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T13:05:32-07:00",
+          "tree_id": "d12cb0fb6aad9f3d275e9f88b9198ba5ce10eb14",
+          "url": "https://github.com/arun-gupta/quizpop/commit/73175aa7ccfd2ba0a0c5d46af5379d532dd6b3c5"
+        },
+        "date": 1779826003208,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 2463,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2624,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1684,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2091,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1778,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1981,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2883,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3465,
             "unit": "ms"
           }
         ]
