@@ -101,15 +101,9 @@ export async function POST(
     let insertPayload: Record<string, unknown>
 
     if (currentQuestion.question_type === 'open_text') {
-      // Open text: multiple submissions allowed; points only on the first one
-      const { count: priorCount } = await supabase
-        .from('player_responses')
-        .select('*', { count: 'exact', head: true })
-        .eq('player_id', playerId)
-        .eq('question_id', currentQuestion.id)
-
+      // Open text: points awarded later based on word-cloud frequency (Family Feud style)
       isCorrect = true
-      awardedPoints = (priorCount ?? 0) === 0 ? currentQuestion.points : 0
+      awardedPoints = 0
       insertPayload = {
         player_id: playerId,
         question_id: currentQuestion.id,

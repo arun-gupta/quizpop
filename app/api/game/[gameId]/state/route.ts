@@ -177,6 +177,50 @@ export async function GET(
         ;(session as Record<string, unknown>).correct_answer_id = correctAnswerId
         ;(session as Record<string, unknown>).state_changed_at = now
 
+        // Award open-text points based on word-cloud frequency (Family Feud style)
+        if (currentQuestion.question_type === 'open_text') {
+          const { data: allResponses } = await supabase
+            .from('player_responses')
+            .select('id, player_id, free_text_response')
+            .eq('question_id', currentQuestion.id)
+            .not('free_text_response', 'is', null)
+
+          if (allResponses && allResponses.length > 0) {
+            const counts: Record<string, number> = {}
+            for (const r of allResponses) {
+              const key = (r.free_text_response as string).trim().toLowerCase()
+              if (key) counts[key] = (counts[key] ?? 0) + 1
+            }
+            const maxCount = Math.max(...Object.values(counts))
+
+            // Per player: find the submission with the highest frequency
+            const playerBest: Record<string, { id: string; count: number }> = {}
+            for (const r of allResponses) {
+              const key = (r.free_text_response as string).trim().toLowerCase()
+              const count = counts[key] ?? 0
+              if (!playerBest[r.player_id] || count > playerBest[r.player_id].count) {
+                playerBest[r.player_id] = { id: r.id, count }
+              }
+            }
+
+            for (const [playerId, { id: responseId, count }] of Object.entries(playerBest)) {
+              const awardedPoints = Math.floor(currentQuestion.points * count / maxCount)
+              if (awardedPoints > 0) {
+                await supabase
+                  .from('player_responses')
+                  .update({ awarded_points: awardedPoints })
+                  .eq('id', responseId)
+                const { data: pl } = await supabase
+                  .from('players').select('total_score').eq('id', playerId).single()
+                await supabase
+                  .from('players')
+                  .update({ total_score: (pl?.total_score ?? 0) + awardedPoints })
+                  .eq('id', playerId)
+              }
+            }
+          }
+        }
+
         supabase.from('analytics_events').insert({
           event_type: 'question_completed',
           game_session_id: gameId,
