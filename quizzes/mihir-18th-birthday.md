@@ -36,33 +36,12 @@ How well do you know Mihir — and the world he was born into?
 - [ ] Roger Federer
 - [ ] LeBron James
 
-## Mihir has now lived through how many FIFA World Cups?
-> timer: 15 | points: 500
-- [ ] 3
-- [x] 4
-- [ ] 5
-- [ ] 2
-
-## What was the most popular social media platform when Mihir started high school (~2019)?
-> timer: 15 | points: 500
-- [ ] Facebook
-- [ ] Snapchat
-- [x] Instagram
-- [ ] TikTok
-
 ## Which game dominated Mihir's generation more than any other?
 > timer: 20 | points: 1000
 - [ ] Minecraft
 - [ ] Roblox
 - [x] Fortnite
 - [ ] Among Us
-
-## At 18, Mihir is now legally allowed to do all of the following EXCEPT:
-> timer: 25 | points: 2000
-- [ ] Vote in elections
-- [ ] Sign a contract
-- [x] Rent a car without a surcharge (must be 25)
-- [ ] Get a tattoo
 
 ## How many days old is Mihir turning 18 today (approximately)?
 > timer: 20 | points: 2000
@@ -85,12 +64,12 @@ How well do you know Mihir — and the world he was born into?
 - [x] iPad
 - [ ] Gmail
 
-## If Mihir had invested ₹1,000 in Bitcoin when it launched in 2009, roughly what would it be worth today?
+## If Mihir had invested $1,000 in Bitcoin when it launched in 2009, roughly what would it be worth today?
 > timer: 30 | points: 2000
-- [ ] ₹10 lakh
-- [ ] ₹1 crore
-- [ ] ₹10 crore
-- [x] Over ₹100 crore
+- [ ] $1 million
+- [ ] $100 million
+- [ ] $1 billion
+- [x] Over $100 billion
 
 ## What's one word that best describes Mihir?
 > type: open_text | timer: 30 | points: 500
