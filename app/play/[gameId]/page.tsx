@@ -269,11 +269,12 @@ interface PlayerResultsProps {
   player: Player
   selectedAnswerId: string | null
   selectedText: string | null
+  submittedTexts: string[]
   correctAnswerId: string | null
   lastResponse: PlayerResponse | null
 }
 
-function PlayerResults({ question, player, selectedAnswerId, selectedText, correctAnswerId, lastResponse }: PlayerResultsProps) {
+function PlayerResults({ question, player, selectedAnswerId, selectedText, submittedTexts, correctAnswerId, lastResponse }: PlayerResultsProps) {
   const [countdown, setCountdown] = useState(5)
   useEffect(() => {
     const interval = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000)
@@ -306,12 +307,16 @@ function PlayerResults({ question, player, selectedAnswerId, selectedText, corre
           />
         )}
 
-        {/* Open text: show what the player typed */}
-        {isOpenText && selectedText && (
-          <div className="bg-violet-500/20 border border-violet-400/40 rounded-2xl p-4">
-            <p className="text-violet-300 text-sm font-bold mb-1">Your answer</p>
-            <p className="text-white font-extrabold text-lg">&ldquo;{selectedText}&rdquo;</p>
-            <p className="text-purple-300 text-sm mt-1">Check the host screen for the word cloud!</p>
+        {/* Open text: show all submitted answers */}
+        {isOpenText && submittedTexts.length > 0 && (
+          <div className="bg-violet-500/20 border border-violet-400/40 rounded-2xl p-4 text-left">
+            <p className="text-violet-300 text-sm font-bold mb-2">Your answers</p>
+            <ul className="space-y-1">
+              {submittedTexts.map((t, i) => (
+                <li key={i} className="text-white font-bold text-base">&ldquo;{t}&rdquo;</li>
+              ))}
+            </ul>
+            <p className="text-purple-300 text-sm mt-2">Check the host screen for the word cloud!</p>
           </div>
         )}
 
@@ -830,6 +835,7 @@ export default function PlayPage() {
         player={player}
         selectedAnswerId={selectedAnswerId}
         selectedText={selectedText}
+        submittedTexts={submittedTexts}
         correctAnswerId={correctAnswerId}
         lastResponse={lastResponse}
       />
