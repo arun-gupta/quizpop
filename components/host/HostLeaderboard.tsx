@@ -23,7 +23,7 @@ export default function HostLeaderboard({
     return () => clearInterval(interval)
   }, [autoAdvanceSecs])
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       {/* Header */}
       <div className="text-center pt-10 pb-6 px-8">
         <h1

@@ -45,7 +45,7 @@ export default function HostResults({
     : Object.values(answerDistribution).reduce((sum, n) => sum + n, 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       {/* Header */}
       <div className="px-8 pt-8 pb-4">
         <div className="text-center">
@@ -61,14 +61,14 @@ export default function HostResults({
       {/* Reveal image — shown only after answer */}
       {question.image_url && question.image_reveal === 'after' && (
         <div className="flex justify-center px-8 pb-2">
-          <div className="relative h-48 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
+          <div className="relative h-40 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
             <Image src={question.image_url} alt="Question image" fill className="object-cover" />
           </div>
         </div>
       )}
 
       {/* Body: word cloud or answer distribution */}
-      <div className="flex-1 px-8 py-4">
+      <div className="flex-1 px-8 py-4 overflow-y-auto">
         {isOpenText ? (
           <div className="bg-black/20 rounded-3xl min-h-[240px] flex items-center justify-center">
             <WordCloud entries={wordCloud ?? []} />

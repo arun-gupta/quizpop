@@ -134,7 +134,7 @@ function QuestionCard({ question, index, total, bucket, view }: {
           </div>
         ) : (
           /* Results view — highlight correct, dim others */
-          <div className="space-y-2">
+          <div className="space-y-2 overflow-y-auto">
             {question.answer_options.map((opt, i) => {
               const cfg = ANSWER_CONFIG[i % 4]
               return (
