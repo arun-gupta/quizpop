@@ -13,9 +13,9 @@ jobs:
       contents: write   # needed to push benchmark history to gh-pages
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.2.2
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4.4.0
         with:
           node-version: 20
           cache: npm
@@ -159,7 +159,7 @@ jobs:
       # Keep raw JSON as a downloadable artifact for 90 days
       - name: Upload result artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: perf-results-${{ github.sha }}
           path: results-*.json
