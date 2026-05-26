@@ -181,8 +181,9 @@ export async function GET(
         if (currentQuestion.question_type === 'open_text') {
           const { data: allResponses } = await supabase
             .from('player_responses')
-            .select('id, player_id, free_text_response')
+            .select('id, player_id, free_text_response, players!inner(game_session_id)')
             .eq('question_id', currentQuestion.id)
+            .eq('players.game_session_id', gameId)
             .not('free_text_response', 'is', null)
 
           if (allResponses && allResponses.length > 0) {
@@ -351,8 +352,9 @@ export async function GET(
         (revealStates.includes(session.game_state) || session.game_state === 'question_active')) {
       const { data: textResponses } = await supabase
         .from('player_responses')
-        .select('free_text_response')
+        .select('free_text_response, players!inner(game_session_id)')
         .eq('question_id', question.id)
+        .eq('players.game_session_id', gameId)
         .not('free_text_response', 'is', null)
 
       const counts: Record<string, number> = {}
