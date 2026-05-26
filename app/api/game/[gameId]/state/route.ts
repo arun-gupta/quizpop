@@ -50,10 +50,10 @@ export async function GET(
       }
     }
 
-    // Block B: question_results → leaderboard (5 s)
+    // Block B: question_results → leaderboard (10 s)
     if (session.game_state === 'question_results' && session.state_changed_at) {
       const elapsed = Date.now() - new Date(session.state_changed_at).getTime()
-      if (elapsed >= 5000) {
+      if (elapsed >= 10000) {
         const now = new Date().toISOString()
 
         const { data: prevSnapshot } = await supabase

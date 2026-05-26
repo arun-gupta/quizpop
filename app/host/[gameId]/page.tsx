@@ -278,7 +278,7 @@ export default function HostGamePage() {
           players={players}
           answerDistribution={answerDistribution}
           wordCloud={wordCloud}
-          autoAdvanceSecs={5}
+          autoAdvanceSecs={10}
         />
       )
       break
