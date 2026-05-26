@@ -67,6 +67,7 @@ interface PlayerQuestionProps {
   question: PublicQuestion
   player: Player
   onAnswer: (answerId: string) => void
+  onTextAnswer: (text: string) => void
   isSubmitting: boolean
 }
 
@@ -77,8 +78,9 @@ const ANSWER_CONFIG = [
   { bg: 'bg-green-500 hover:bg-green-400 active:bg-green-600', emoji: '■', shape: 'Square' },
 ]
 
-function PlayerQuestion({ session, question, player, onAnswer, isSubmitting }: PlayerQuestionProps) {
+function PlayerQuestion({ session, question, player, onAnswer, onTextAnswer, isSubmitting }: PlayerQuestionProps) {
   const [timeLeft, setTimeLeft] = useState(question.timer_seconds)
+  const [typedAnswer, setTypedAnswer] = useState('')
   const startTime = useRef<number>(
     session.question_started_at ? new Date(session.question_started_at).getTime() : Date.now()
   )
@@ -137,30 +139,51 @@ function PlayerQuestion({ session, question, player, onAnswer, isSubmitting }: P
           )}
         </div>
 
-        {/* Answer grid */}
-        <div className="grid grid-cols-2 gap-3 flex-1">
-          {question.answer_options.map((option, index) => {
-            const config = ANSWER_CONFIG[index % 4]
-            return (
-              <button
-                key={option.id}
-                onClick={() => !isSubmitting && onAnswer(option.id)}
-                disabled={isSubmitting || timeLeft <= 0}
-                className={`
-                  ${config.bg} text-white rounded-2xl p-4
-                  flex flex-col items-center justify-center gap-2
-                  transform active:scale-95 transition-all duration-150
-                  font-bold text-base shadow-lg
-                  disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
-                  min-h-[100px]
-                `}
-              >
-                <span className="text-2xl">{config.emoji}</span>
-                <span className="text-center leading-tight">{option.answer_text}</span>
-              </button>
-            )
-          })}
-        </div>
+        {/* Answer area */}
+        {question.question_type === 'open_text' ? (
+          <div className="flex flex-col gap-4 flex-1">
+            <textarea
+              className="w-full bg-white/10 border-2 border-white/20 rounded-2xl p-4 text-white text-xl font-bold placeholder-white/30 resize-none focus:outline-none focus:border-violet-400 transition-colors"
+              rows={3}
+              maxLength={120}
+              placeholder="Type your answer…"
+              value={typedAnswer}
+              onChange={e => setTypedAnswer(e.target.value)}
+              disabled={isSubmitting || timeLeft <= 0}
+            />
+            <button
+              onClick={() => !isSubmitting && typedAnswer.trim() && onTextAnswer(typedAnswer.trim())}
+              disabled={isSubmitting || !typedAnswer.trim() || timeLeft <= 0}
+              className="w-full bg-violet-500 hover:bg-violet-400 active:bg-violet-600 text-white text-xl font-extrabold rounded-2xl py-4 transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Submit ✓
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 flex-1">
+            {question.answer_options.map((option, index) => {
+              const config = ANSWER_CONFIG[index % 4]
+              return (
+                <button
+                  key={option.id}
+                  onClick={() => !isSubmitting && onAnswer(option.id)}
+                  disabled={isSubmitting || timeLeft <= 0}
+                  className={`
+                    ${config.bg} text-white rounded-2xl p-4
+                    flex flex-col items-center justify-center gap-2
+                    transform active:scale-95 transition-all duration-150
+                    font-bold text-base shadow-lg
+                    disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
+                    min-h-[100px]
+                  `}
+                >
+                  <span className="text-2xl">{config.emoji}</span>
+                  <span className="text-center leading-tight">{option.answer_text}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {timeLeft <= 0 && !isSubmitting && (
           <div className="text-center py-4 animate-bounce-in">
@@ -176,13 +199,14 @@ function PlayerQuestion({ session, question, player, onAnswer, isSubmitting }: P
 interface PlayerAnsweredProps {
   question: PublicQuestion
   player: Player
-  selectedAnswerId: string
+  selectedAnswerId: string | null
+  selectedText: string | null
 }
 
-function PlayerAnswered({ question, player, selectedAnswerId }: PlayerAnsweredProps) {
+function PlayerAnswered({ question, player, selectedAnswerId, selectedText }: PlayerAnsweredProps) {
   const selectedOption = question.answer_options.find(o => o.id === selectedAnswerId)
   const selectedIndex = question.answer_options.findIndex(o => o.id === selectedAnswerId)
-  const config = ANSWER_CONFIG[selectedIndex % 4]
+  const config = ANSWER_CONFIG[Math.max(0, selectedIndex) % 4]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col items-center justify-center px-4 py-8">
@@ -200,12 +224,17 @@ function PlayerAnswered({ question, player, selectedAnswerId }: PlayerAnsweredPr
           <p className="text-purple-200 mt-1">Good luck, {player.display_name}!</p>
         </div>
 
-        {selectedOption && (
+        {question.question_type === 'open_text' && selectedText ? (
+          <div className="bg-violet-500/30 border border-violet-400/40 rounded-2xl p-4">
+            <p className="text-violet-300 text-sm font-bold mb-1">Your answer</p>
+            <p className="font-extrabold text-white text-lg">&ldquo;{selectedText}&rdquo;</p>
+          </div>
+        ) : selectedOption ? (
           <div className={`${config.bg} rounded-2xl p-4 flex items-center gap-3`}>
             <span className="text-2xl">{config.emoji}</span>
             <span className="font-bold text-white text-lg">{selectedOption.answer_text}</span>
           </div>
-        )}
+        ) : null}
 
         <WaitingSpinner message="Waiting for everyone to answer..." />
       </div>
@@ -217,48 +246,55 @@ interface PlayerResultsProps {
   question: PublicQuestion
   player: Player
   selectedAnswerId: string | null
+  selectedText: string | null
   correctAnswerId: string | null
   lastResponse: PlayerResponse | null
 }
 
-function PlayerResults({ question, player, selectedAnswerId, correctAnswerId, lastResponse }: PlayerResultsProps) {
+function PlayerResults({ question, player, selectedAnswerId, selectedText, correctAnswerId, lastResponse }: PlayerResultsProps) {
   const [countdown, setCountdown] = useState(5)
   useEffect(() => {
     const interval = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000)
     return () => clearInterval(interval)
   }, [])
 
-  const isCorrect = selectedAnswerId && correctAnswerId && selectedAnswerId === correctAnswerId
-  const correctOption = question.answer_options.find(o => o.id === correctAnswerId)
+  const isOpenText = question.question_type === 'open_text'
+  const isCorrect = !isOpenText && selectedAnswerId && correctAnswerId && selectedAnswerId === correctAnswerId
+  const correctOption = !isOpenText ? question.answer_options.find(o => o.id === correctAnswerId) : null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm text-center space-y-6 animate-bounce-in">
         {/* Result icon */}
         <div className="text-8xl">
-          {!selectedAnswerId ? '⏰' : isCorrect ? '🎉' : '😅'}
+          {isOpenText ? '💬' : !selectedAnswerId ? '⏰' : isCorrect ? '🎉' : '😅'}
         </div>
 
-        <h2 className={`text-4xl font-black ${
-          !selectedAnswerId ? 'text-yellow-400' :
-          isCorrect ? 'text-emerald-400' : 'text-red-400'
-        }`}>
-          {!selectedAnswerId ? "Too slow!" :
-           isCorrect ? "Correct!" : "Wrong!"}
+        <h2 className={`text-4xl font-black ${isOpenText ? 'text-violet-300' : !selectedAnswerId ? 'text-yellow-400' : isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
+          {isOpenText ? 'Answered!' : !selectedAnswerId ? 'Too slow!' : isCorrect ? 'Correct!' : 'Wrong!'}
         </h2>
+
+        {/* Open text: show what the player typed */}
+        {isOpenText && selectedText && (
+          <div className="bg-violet-500/20 border border-violet-400/40 rounded-2xl p-4">
+            <p className="text-violet-300 text-sm font-bold mb-1">Your answer</p>
+            <p className="text-white font-extrabold text-lg">&ldquo;{selectedText}&rdquo;</p>
+            <p className="text-purple-300 text-sm mt-1">Check the host screen for the word cloud!</p>
+          </div>
+        )}
 
         {/* Points earned */}
         {lastResponse && lastResponse.awarded_points > 0 && (
           <div className="card-glass p-4 animate-slide-in-up">
             <p className="text-purple-300 font-semibold">Points earned</p>
             <p className="text-4xl font-black text-yellow-400">+{lastResponse.awarded_points}</p>
-            {lastResponse.response_time_ms < 3000 && (
+            {!isOpenText && lastResponse.response_time_ms < 3000 && (
               <p className="text-emerald-400 text-sm font-bold">⚡ Speed bonus!</p>
             )}
           </div>
         )}
 
-        {/* Correct answer reveal */}
+        {/* Correct answer reveal (MC only) */}
         {correctOption && (
           <div className="bg-emerald-500/20 border border-emerald-500/40 rounded-2xl p-4">
             <p className="text-emerald-300 text-sm font-bold mb-1">Correct answer</p>
@@ -461,6 +497,7 @@ export default function PlayPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [correctAnswerId, setCorrectAnswerId] = useState<string | null>(null)
   const [selectedAnswerId, setSelectedAnswerId] = useState<string | null>(null)
+  const [selectedText, setSelectedText] = useState<string | null>(null)
   const [lastResponse, setLastResponse] = useState<PlayerResponse | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -529,6 +566,7 @@ export default function PlayPage() {
       if (currentSession.current_question_index !== lastQuestionIndexRef.current) {
         lastQuestionIndexRef.current = currentSession.current_question_index
         setSelectedAnswerId(null)
+        setSelectedText(null)
         setLastResponse(null)
         setIsSubmitting(false)
       }
@@ -632,13 +670,37 @@ export default function PlayPage() {
       if (!res.ok) {
         const data = await res.json()
         console.error('Answer submission failed:', data.error)
-        // Don't revert selection — keep optimistic UI
       }
     } catch (err) {
       console.error('Failed to submit answer:', err)
     }
-    // Keep isSubmitting true to prevent double-submit;
-    // it resets when question changes via fetchGameState
+  }
+
+  async function submitTextAnswer(text: string) {
+    if (isSubmitting || !session?.question_started_at) return
+
+    const playerId = JSON.parse(localStorage.getItem(`playerData_${gameId}`) || '{}').playerId
+    if (!playerId) return
+
+    setSelectedText(text)
+    setIsSubmitting(true)
+
+    const responseTimeMs = Date.now() - new Date(session.question_started_at).getTime()
+
+    try {
+      const res = await fetch(`/api/game/${gameId}/answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId, freeTextResponse: text, responseTimeMs }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        console.error('Text answer submission failed:', data.error)
+      }
+    } catch (err) {
+      console.error('Failed to submit text answer:', err)
+    }
   }
 
   if (isLoading) {
@@ -684,8 +746,8 @@ export default function PlayPage() {
       )
     }
 
-    if (selectedAnswerId) {
-      return <PlayerAnswered question={question} player={player} selectedAnswerId={selectedAnswerId} />
+    if (selectedAnswerId || selectedText) {
+      return <PlayerAnswered question={question} player={player} selectedAnswerId={selectedAnswerId} selectedText={selectedText} />
     }
 
     return (
@@ -694,6 +756,7 @@ export default function PlayPage() {
         question={question}
         player={player}
         onAnswer={submitAnswer}
+        onTextAnswer={submitTextAnswer}
         isSubmitting={isSubmitting}
       />
     )
@@ -706,6 +769,7 @@ export default function PlayPage() {
         question={question}
         player={player}
         selectedAnswerId={selectedAnswerId}
+        selectedText={selectedText}
         correctAnswerId={correctAnswerId}
         lastResponse={lastResponse}
       />

@@ -13,13 +13,19 @@ export async function POST(
     }
 
     const body = await req.json()
-    const { playerId, answerId, responseTimeMs } = body
+    const { playerId, answerId, freeTextResponse, responseTimeMs } = body
 
     if (!playerId || typeof playerId !== 'string') {
       return NextResponse.json({ error: 'playerId required' }, { status: 400 })
     }
-    if (!answerId || typeof answerId !== 'string') {
-      return NextResponse.json({ error: 'answerId required' }, { status: 400 })
+    if (!answerId && !freeTextResponse) {
+      return NextResponse.json({ error: 'answerId or freeTextResponse required' }, { status: 400 })
+    }
+    if (answerId && typeof answerId !== 'string') {
+      return NextResponse.json({ error: 'answerId must be a string' }, { status: 400 })
+    }
+    if (freeTextResponse && (typeof freeTextResponse !== 'string' || !freeTextResponse.trim())) {
+      return NextResponse.json({ error: 'freeTextResponse must be a non-empty string' }, { status: 400 })
     }
     if (typeof responseTimeMs !== 'number' || responseTimeMs < 0) {
       return NextResponse.json({ error: 'responseTimeMs must be a non-negative number' }, { status: 400 })
@@ -46,10 +52,10 @@ export async function POST(
       )
     }
 
-    // Fetch current question with timer and points
+    // Fetch current question with timer, points, and type
     const { data: questions, error: questionsError } = await supabase
       .from('questions')
-      .select('id, timer_seconds, points')
+      .select('id, timer_seconds, points, question_type')
       .eq('quiz_id', session.quiz_id)
       .order('display_order', { ascending: true })
 
@@ -116,42 +122,55 @@ export async function POST(
       )
     }
 
-    // Fetch the chosen answer option to check correctness
-    const { data: answerOption, error: answerError } = await supabase
-      .from('answer_options')
-      .select('id, question_id, is_correct')
-      .eq('id', answerId)
-      .eq('question_id', currentQuestion.id)
-      .single()
+    let isCorrect: boolean
+    let awardedPoints: number
+    let insertPayload: Record<string, unknown>
 
-    if (answerError || !answerOption) {
-      return NextResponse.json(
-        { error: 'Answer option not found or does not belong to the current question.' },
-        { status: 404 }
-      )
-    }
+    if (currentQuestion.question_type === 'open_text') {
+      // Open text: everyone who answers gets base participation points
+      isCorrect = true
+      awardedPoints = currentQuestion.points
+      insertPayload = {
+        player_id: playerId,
+        question_id: currentQuestion.id,
+        selected_answer_id: null,
+        free_text_response: (freeTextResponse as string).trim(),
+        response_time_ms: responseTimeMs,
+        is_correct: true,
+        awarded_points: awardedPoints,
+      }
+    } else {
+      // Multiple choice: look up the chosen option
+      const { data: answerOption, error: answerError } = await supabase
+        .from('answer_options')
+        .select('id, question_id, is_correct')
+        .eq('id', answerId)
+        .eq('question_id', currentQuestion.id)
+        .single()
 
-    const isCorrect = answerOption.is_correct
+      if (answerError || !answerOption) {
+        return NextResponse.json(
+          { error: 'Answer option not found or does not belong to the current question.' },
+          { status: 404 }
+        )
+      }
 
-    // Calculate score using the scoring formula
-    const awardedPoints = calculateScore(
-      isCorrect,
-      responseTimeMs,
-      currentQuestion.timer_seconds,
-      currentQuestion.points
-    )
-
-    // Insert player response (DB trigger will update player.total_score)
-    const { data: response, error: insertError } = await supabase
-      .from('player_responses')
-      .insert({
+      isCorrect = answerOption.is_correct
+      awardedPoints = calculateScore(isCorrect, responseTimeMs, currentQuestion.timer_seconds, currentQuestion.points)
+      insertPayload = {
         player_id: playerId,
         question_id: currentQuestion.id,
         selected_answer_id: answerId,
         response_time_ms: responseTimeMs,
         is_correct: isCorrect,
         awarded_points: awardedPoints,
-      })
+      }
+    }
+
+    // Insert player response (DB trigger will update player.total_score)
+    const { data: response, error: insertError } = await supabase
+      .from('player_responses')
+      .insert(insertPayload)
       .select('id, is_correct, awarded_points')
       .single()
 
@@ -212,20 +231,29 @@ export async function POST(
       playerCount > 0 &&
       responseCount >= playerCount
     ) {
-      // All players answered — reveal the correct answer automatically
-      const { data: correctOption } = await supabase
-        .from('answer_options')
-        .select('id')
-        .eq('question_id', currentQuestion.id)
-        .eq('is_correct', true)
-        .single()
-
-      if (correctOption) {
+      if (currentQuestion.question_type === 'open_text') {
+        // Open text: reveal with no correct_answer_id
         await supabase
           .from('game_sessions')
-          .update({ game_state: 'question_results', correct_answer_id: correctOption.id })
+          .update({ game_state: 'question_results', correct_answer_id: null })
           .eq('id', gameId)
-          .eq('game_state', 'question_active') // guard against race conditions
+          .eq('game_state', 'question_active')
+      } else {
+        // Multiple choice: reveal the correct answer
+        const { data: correctOption } = await supabase
+          .from('answer_options')
+          .select('id')
+          .eq('question_id', currentQuestion.id)
+          .eq('is_correct', true)
+          .single()
+
+        if (correctOption) {
+          await supabase
+            .from('game_sessions')
+            .update({ game_state: 'question_results', correct_answer_id: correctOption.id })
+            .eq('id', gameId)
+            .eq('game_state', 'question_active')
+        }
       }
     }
 

@@ -1,5 +1,12 @@
 export type GameState = 'lobby' | 'question_active' | 'question_results' | 'leaderboard' | 'finished'
 
+export type QuestionType = 'multiple_choice' | 'open_text'
+
+export interface WordCloudEntry {
+  text: string
+  count: number
+}
+
 export type AdminRole = 'admin' | 'super_admin'
 
 export interface Quiz {
@@ -17,6 +24,7 @@ export interface Question {
   timer_seconds: number
   points: number
   display_order: number
+  question_type: QuestionType
 }
 
 export interface AnswerOption {
@@ -54,7 +62,8 @@ export interface PlayerResponse {
   id: string
   player_id: string
   question_id: string
-  selected_answer_id: string
+  selected_answer_id: string | null
+  free_text_response: string | null
   response_time_ms: number
   is_correct: boolean
   awarded_points: number
@@ -124,6 +133,7 @@ export interface PublicQuestion {
   timer_seconds: number
   points: number
   display_order: number
+  question_type: QuestionType
   answer_options: PublicAnswerOption[]
 }
 
@@ -134,6 +144,7 @@ export interface GameStateResponse {
   playerCount: number
   leaderboard: LeaderboardEntry[] | null
   correctAnswerId: string | null
+  wordCloud: WordCloudEntry[] | null
 }
 
 export interface JoinGameResponse {

@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
           timer_seconds: q.timer_seconds,
           points: q.points,
           display_order: q.display_order,
+          question_type: q.question_type ?? 'multiple_choice',
         })
         .select()
         .single()
@@ -70,18 +71,21 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Failed to insert question ${q.display_order}` }, { status: 500 })
       }
 
-      const { error: optError } = await service.from('answer_options').insert(
-        q.answer_options.map(opt => ({
-          question_id: question.id,
-          answer_text: opt.answer_text,
-          is_correct: opt.is_correct,
-          display_order: opt.display_order,
-        }))
-      )
+      // Open text questions have no answer options
+      if (q.answer_options.length > 0) {
+        const { error: optError } = await service.from('answer_options').insert(
+          q.answer_options.map(opt => ({
+            question_id: question.id,
+            answer_text: opt.answer_text,
+            is_correct: opt.is_correct,
+            display_order: opt.display_order,
+          }))
+        )
 
-      if (optError) {
-        await service.from('quizzes').delete().eq('id', quiz.id)
-        return NextResponse.json({ error: `Failed to insert answer options for question ${q.display_order}` }, { status: 500 })
+        if (optError) {
+          await service.from('quizzes').delete().eq('id', quiz.id)
+          return NextResponse.json({ error: `Failed to insert answer options for question ${q.display_order}` }, { status: 500 })
+        }
       }
     }
 

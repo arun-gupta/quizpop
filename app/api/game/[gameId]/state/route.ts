@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
-import type { GameStateResponse, LeaderboardEntry, PublicQuestion } from '@/types/database'
+import type { GameStateResponse, LeaderboardEntry, PublicQuestion, WordCloudEntry } from '@/types/database'
 
 export async function GET(
   req: NextRequest,
@@ -62,7 +62,7 @@ export async function GET(
     if (session.game_state !== 'finished') {
       const { data: questions, error: questionsError } = await supabase
         .from('questions')
-        .select('id, quiz_id, question_text, image_url, timer_seconds, points, display_order')
+        .select('id, quiz_id, question_text, image_url, timer_seconds, points, display_order, question_type')
         .eq('quiz_id', session.quiz_id)
         .order('display_order', { ascending: true })
 
@@ -74,39 +74,59 @@ export async function GET(
       const currentQuestion = questions?.[session.current_question_index] ?? null
 
       if (currentQuestion) {
-        // Fetch answer options without is_correct
-        const { data: answerOptions, error: optionsError } = await supabase
-          .from('answer_options')
-          .select('id, question_id, answer_text, display_order')
-          .eq('question_id', currentQuestion.id)
-          .order('display_order', { ascending: true })
+        if (currentQuestion.question_type === 'open_text') {
+          question = { ...currentQuestion, answer_options: [] }
+        } else {
+          // Fetch answer options without is_correct
+          const { data: answerOptions, error: optionsError } = await supabase
+            .from('answer_options')
+            .select('id, question_id, answer_text, display_order')
+            .eq('question_id', currentQuestion.id)
+            .order('display_order', { ascending: true })
 
-        if (optionsError) {
-          console.error('Answer options fetch error:', optionsError)
-          return NextResponse.json({ error: 'Failed to fetch answer options' }, { status: 500 })
-        }
+          if (optionsError) {
+            console.error('Answer options fetch error:', optionsError)
+            return NextResponse.json({ error: 'Failed to fetch answer options' }, { status: 500 })
+          }
 
-        // Shuffle so the correct answer isn't always in the same position
-        const shuffled = [...(answerOptions ?? [])]
-        for (let i = shuffled.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-        }
+          // Shuffle so the correct answer isn't always in the same position
+          const shuffled = [...(answerOptions ?? [])]
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+          }
 
-        question = {
-          ...currentQuestion,
-          answer_options: shuffled,
+          question = { ...currentQuestion, answer_options: shuffled }
         }
       }
     }
 
-    // Determine leaderboard and correctAnswerId based on state
+    // Determine leaderboard, correctAnswerId, and wordCloud based on state
     let leaderboard: LeaderboardEntry[] | null = null
     let correctAnswerId: string | null = null
+    let wordCloud: WordCloudEntry[] | null = null
 
     const revealStates = ['question_results', 'leaderboard', 'finished']
     if (revealStates.includes(session.game_state)) {
       correctAnswerId = session.correct_answer_id
+
+      // For open_text questions, aggregate free-text responses into a word cloud
+      if (question?.question_type === 'open_text') {
+        const { data: textResponses } = await supabase
+          .from('player_responses')
+          .select('free_text_response')
+          .eq('question_id', question.id)
+          .not('free_text_response', 'is', null)
+
+        const counts: Record<string, number> = {}
+        for (const r of textResponses ?? []) {
+          const key = (r.free_text_response as string).trim().toLowerCase()
+          if (key) counts[key] = (counts[key] ?? 0) + 1
+        }
+        wordCloud = Object.entries(counts)
+          .map(([text, count]) => ({ text, count }))
+          .sort((a, b) => b.count - a.count)
+      }
 
       // Fetch the latest leaderboard snapshot
       const { data: snapshot } = await supabase
@@ -138,6 +158,7 @@ export async function GET(
       playerCount: players?.length ?? 0,
       leaderboard,
       correctAnswerId,
+      wordCloud,
     }
 
     return NextResponse.json(response)

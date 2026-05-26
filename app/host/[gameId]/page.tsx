@@ -8,6 +8,7 @@ import type {
   Player,
   PublicQuestion,
   LeaderboardEntry,
+  WordCloudEntry,
 } from '@/types/database'
 import HostLobby from '@/components/host/HostLobby'
 import HostQuestion from '@/components/host/HostQuestion'
@@ -27,6 +28,7 @@ export default function HostGamePage() {
   const [hostToken, setHostToken] = useState<string>('')
   const [responseCount, setResponseCount] = useState(0)
   const [answerDistribution, setAnswerDistribution] = useState<Record<string, number>>({})
+  const [wordCloud, setWordCloud] = useState<WordCloudEntry[] | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
@@ -74,9 +76,11 @@ export default function HostGamePage() {
         currentQuestionIdRef.current = newQuestion?.id ?? null
         setResponseCount(0)
         setAnswerDistribution({})
+        setWordCloud(null)
       }
       setQuestion(newQuestion)
       setLeaderboard(data.leaderboard ?? [])
+      if (data.wordCloud) setWordCloud(data.wordCloud)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load game')
     } finally {
@@ -336,9 +340,10 @@ export default function HostGamePage() {
       if (question) content = (
         <HostResults
           question={question}
-          correctAnswerId={session.correct_answer_id ?? ''}
+          correctAnswerId={session.correct_answer_id ?? null}
           players={players}
           answerDistribution={answerDistribution}
+          wordCloud={wordCloud}
           onLeaderboard={handleShowLeaderboard}
           autoAdvanceSecs={5}
         />

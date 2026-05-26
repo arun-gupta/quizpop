@@ -12,6 +12,7 @@ export interface ParsedQuestion {
   timer_seconds: number
   points: number
   display_order: number
+  question_type: 'multiple_choice' | 'open_text'
   answer_options: ParsedAnswerOption[]
 }
 
@@ -86,6 +87,7 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
         timer_seconds: DEFAULT_TIMER,
         points: DEFAULT_POINTS,
         display_order: 0,
+        question_type: 'multiple_choice',
         answer_options: [],
       }
       continue
@@ -99,9 +101,11 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
       const timerMatch = meta.match(/timer:\s*(\d+)/i)
       const pointsMatch = meta.match(/points:\s*(\d+)/i)
       const imageMatch = meta.match(/image:\s*(https?:\/\/\S+)/i)
+      const typeMatch = meta.match(/type:\s*(open_text|multiple_choice)/i)
       if (timerMatch) currentQuestion.timer_seconds = parseInt(timerMatch[1], 10)
       if (pointsMatch) currentQuestion.points = parseInt(pointsMatch[1], 10)
       if (imageMatch) currentQuestion.image_url = imageMatch[1].trim()
+      if (typeMatch) currentQuestion.question_type = typeMatch[1].toLowerCase() as 'multiple_choice' | 'open_text'
       continue
     }
 
@@ -166,6 +170,13 @@ function validateQuestion(
     return errors
   }
 
+  if (q.question_type === 'open_text') {
+    if (q.answer_options.length > 0) {
+      errors.push(`${label}: open_text questions should not have answer options`)
+    }
+    return errors
+  }
+
   if (q.answer_options.length < 2) {
     errors.push(`${label}: needs at least 2 answer options`)
   } else if (q.answer_options.length > 4) {
@@ -212,5 +223,8 @@ Fun questions for all ages — perfect for parties!
 - [ ] Lion
 - [ ] Greyhound
 - [ ] Peregrine Falcon
+
+## What's your favourite thing about this party?
+> type: open_text | timer: 30 | points: 500
 `
 }

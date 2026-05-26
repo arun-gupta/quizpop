@@ -58,10 +58,10 @@ export async function POST(
         )
       }
 
-      // Get the current question
+      // Get the current question (including type)
       const { data: questions, error: questionsError } = await supabase
         .from('questions')
-        .select('id')
+        .select('id, question_type')
         .eq('quiz_id', session.quiz_id)
         .order('display_order', { ascending: true })
 
@@ -74,17 +74,22 @@ export async function POST(
         return NextResponse.json({ error: 'Current question not found' }, { status: 500 })
       }
 
-      // Get the correct answer option
-      const { data: correctOption, error: optionError } = await supabase
-        .from('answer_options')
-        .select('id')
-        .eq('question_id', currentQuestion.id)
-        .eq('is_correct', true)
-        .single()
+      let correctAnswerId: string | null = null
 
-      if (optionError || !correctOption) {
-        console.error('Correct answer lookup error:', optionError)
-        return NextResponse.json({ error: 'Failed to find correct answer' }, { status: 500 })
+      if (currentQuestion.question_type !== 'open_text') {
+        // Multiple choice: find the correct answer option
+        const { data: correctOption, error: optionError } = await supabase
+          .from('answer_options')
+          .select('id')
+          .eq('question_id', currentQuestion.id)
+          .eq('is_correct', true)
+          .single()
+
+        if (optionError || !correctOption) {
+          console.error('Correct answer lookup error:', optionError)
+          return NextResponse.json({ error: 'Failed to find correct answer' }, { status: 500 })
+        }
+        correctAnswerId = correctOption.id
       }
 
       // Transition to question_results
@@ -92,7 +97,7 @@ export async function POST(
         .from('game_sessions')
         .update({
           game_state: 'question_results',
-          correct_answer_id: correctOption.id,
+          correct_answer_id: correctAnswerId,
         })
         .eq('id', gameId)
 
@@ -108,13 +113,13 @@ export async function POST(
         metadata: {
           question_index: session.current_question_index,
           question_id: currentQuestion.id,
-          correct_answer_id: correctOption.id,
+          correct_answer_id: correctAnswerId,
         },
       }).then(({ error }) => {
         if (error) console.warn('Analytics event failed:', error.message)
       })
 
-      return NextResponse.json({ success: true, correctAnswerId: correctOption.id })
+      return NextResponse.json({ success: true, correctAnswerId })
     }
 
     // -------------------------------------------------------------------------
