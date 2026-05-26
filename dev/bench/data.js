@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779816221088,
+  "lastUpdate": 1779816525318,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -1597,6 +1597,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3102,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "b28e78c76533b08efc83e2f0307d5d981c6fcc1d",
+          "message": "feat: Family Feud scoring for open-text questions\n\nPoints are now awarded at question reveal based on word-cloud frequency:\n- Most popular answer gets full base_points\n- Others get floor(base_points × count / maxCount)\n- Per player, their highest-frequency submission wins\n- Submissions always insert with 0 points; Block C awards final scores\n  and increments players.total_score when the timer expires.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T10:27:40-07:00",
+          "tree_id": "c9157ae9a982054dc68789d53a07f5e49035b9a4",
+          "url": "https://github.com/arun-gupta/quizpop/commit/b28e78c76533b08efc83e2f0307d5d981c6fcc1d"
+        },
+        "date": 1779816524998,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1558,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 1841,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 2298,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2724,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1747,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1991,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2515,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3103,
             "unit": "ms"
           }
         ]
