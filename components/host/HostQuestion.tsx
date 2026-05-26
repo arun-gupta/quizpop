@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { PublicQuestion, Player } from '@/types/database'
+import { PublicQuestion, Player, WordCloudEntry } from '@/types/database'
 import CountdownTimer from '@/components/game/CountdownTimer'
+import WordCloud from '@/components/game/WordCloud'
 
 const ANSWER_CONFIG = [
   { bg: 'bg-red-500', emoji: '▲' },
@@ -17,6 +18,7 @@ interface HostQuestionProps {
   players: Player[]
   responses: number
   questionStartedAt: string | null
+  wordCloud?: WordCloudEntry[] | null
 }
 
 export default function HostQuestion({
@@ -24,6 +26,7 @@ export default function HostQuestion({
   players,
   responses,
   questionStartedAt,
+  wordCloud,
 }: HostQuestionProps) {
   const [secondsLeft, setSecondsLeft] = useState(question.timer_seconds)
 
@@ -98,28 +101,34 @@ export default function HostQuestion({
           </div>
         )}
 
-        {/* Answer options */}
-        <div className="grid grid-cols-2 gap-4 flex-1">
-          {[...question.answer_options].map((option, i) => {
-              const config = ANSWER_CONFIG[i % 4]
-              return (
-                <div
-                  key={option.id}
-                  className={[
-                    'rounded-2xl p-4 flex items-center gap-4 shadow-lg',
-                    config.bg,
-                  ].join(' ')}
-                >
-                  <span className="text-white text-3xl w-10 text-center flex-shrink-0">
-                    {config.emoji}
-                  </span>
-                  <span className="text-white text-xl font-bold leading-snug">
-                    {option.answer_text}
-                  </span>
-                </div>
-              )
-            })}
-        </div>
+        {/* Answer options or live word cloud */}
+        {question.question_type === 'open_text' ? (
+          <div className="flex-1 bg-black/20 rounded-3xl flex items-center justify-center min-h-0">
+            <WordCloud entries={wordCloud ?? []} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 flex-1">
+            {[...question.answer_options].map((option, i) => {
+                const config = ANSWER_CONFIG[i % 4]
+                return (
+                  <div
+                    key={option.id}
+                    className={[
+                      'rounded-2xl p-4 flex items-center gap-4 shadow-lg',
+                      config.bg,
+                    ].join(' ')}
+                  >
+                    <span className="text-white text-3xl w-10 text-center flex-shrink-0">
+                      {config.emoji}
+                    </span>
+                    <span className="text-white text-xl font-bold leading-snug">
+                      {option.answer_text}
+                    </span>
+                  </div>
+                )
+              })}
+          </div>
+        )}
       </div>
 
       {/* Bottom bar */}

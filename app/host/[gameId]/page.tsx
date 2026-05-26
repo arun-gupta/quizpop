@@ -129,12 +129,17 @@ export default function HostGamePage() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'player_responses' },
         (payload) => {
-          const response = payload.new as { selected_answer_id: string }
+          const response = payload.new as { selected_answer_id: string | null; free_text_response: string | null }
           setResponseCount((prev) => prev + 1)
-          setAnswerDistribution((prev) => ({
-            ...prev,
-            [response.selected_answer_id]: (prev[response.selected_answer_id] ?? 0) + 1,
-          }))
+          if (response.selected_answer_id) {
+            setAnswerDistribution((prev) => ({
+              ...prev,
+              [response.selected_answer_id!]: (prev[response.selected_answer_id!] ?? 0) + 1,
+            }))
+          } else if (response.free_text_response) {
+            // Open-text response: refresh to get updated word cloud
+            fetchGameState()
+          }
         }
       )
       .subscribe()
@@ -260,6 +265,7 @@ export default function HostGamePage() {
           players={players}
           responses={responseCount}
           questionStartedAt={session.question_started_at}
+          wordCloud={wordCloud}
         />
       )
       break

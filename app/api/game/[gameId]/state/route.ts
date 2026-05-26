@@ -300,23 +300,28 @@ export async function GET(
     const revealStates = ['question_results', 'leaderboard', 'finished']
     if (revealStates.includes(session.game_state)) {
       correctAnswerId = session.correct_answer_id
+    }
 
-      if (question?.question_type === 'open_text') {
-        const { data: textResponses } = await supabase
-          .from('player_responses')
-          .select('free_text_response')
-          .eq('question_id', question.id)
-          .not('free_text_response', 'is', null)
+    // Build word cloud for open_text questions during active play AND results
+    if (question?.question_type === 'open_text' &&
+        (revealStates.includes(session.game_state) || session.game_state === 'question_active')) {
+      const { data: textResponses } = await supabase
+        .from('player_responses')
+        .select('free_text_response')
+        .eq('question_id', question.id)
+        .not('free_text_response', 'is', null)
 
-        const counts: Record<string, number> = {}
-        for (const r of textResponses ?? []) {
-          const key = (r.free_text_response as string).trim().toLowerCase()
-          if (key) counts[key] = (counts[key] ?? 0) + 1
-        }
-        wordCloud = Object.entries(counts)
-          .map(([text, count]) => ({ text, count }))
-          .sort((a, b) => b.count - a.count)
+      const counts: Record<string, number> = {}
+      for (const r of textResponses ?? []) {
+        const key = (r.free_text_response as string).trim().toLowerCase()
+        if (key) counts[key] = (counts[key] ?? 0) + 1
       }
+      wordCloud = Object.entries(counts)
+        .map(([text, count]) => ({ text, count }))
+        .sort((a, b) => b.count - a.count)
+    }
+
+    if (revealStates.includes(session.game_state)) {
 
       const { data: snapshot } = await supabase
         .from('leaderboard_snapshots')
