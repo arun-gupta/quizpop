@@ -21,13 +21,28 @@ export async function GET(
     const { data: session, error: sessionError } = await supabase
       .from('game_sessions')
       .select(
-        'id, quiz_id, join_code, game_state, current_question_index, question_started_at, correct_answer_id, started_at, completed_at, created_at'
+        'id, quiz_id, join_code, game_state, current_question_index, question_started_at, section_intro_at, correct_answer_id, started_at, completed_at, created_at'
       )
       .eq('id', gameId)
       .single()
 
     if (sessionError || !session) {
       return NextResponse.json({ error: 'Game session not found' }, { status: 404 })
+    }
+
+    // Auto-transition section_intro → question_active after 5 seconds
+    if (session.game_state === 'section_intro' && session.section_intro_at) {
+      const elapsed = Date.now() - new Date(session.section_intro_at).getTime()
+      if (elapsed >= 5000) {
+        const now = new Date().toISOString()
+        await supabase
+          .from('game_sessions')
+          .update({ game_state: 'question_active', question_started_at: now })
+          .eq('id', gameId)
+        // Mutate local session so the rest of the handler sees the updated state
+        session.game_state = 'question_active'
+        ;(session as Record<string, unknown>).question_started_at = now
+      }
     }
 
     // If playerId provided, verify the player belongs to this session

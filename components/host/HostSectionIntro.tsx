@@ -1,54 +1,44 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { PublicQuestion } from '@/types/database'
 
 interface HostSectionIntroProps {
-  question: PublicQuestion
-  onBegin: () => void
-  isBeginning: boolean
-  autoAdvanceSecs?: number
+  sectionTitle: string
+  introStartedAt: string | null
 }
 
-export default function HostSectionIntro({
-  question,
-  onBegin,
-  isBeginning,
-  autoAdvanceSecs = 5,
-}: HostSectionIntroProps) {
-  const [countdown, setCountdown] = useState(autoAdvanceSecs)
+const INTRO_DURATION_MS = 5000
+
+export default function HostSectionIntro({ sectionTitle, introStartedAt }: HostSectionIntroProps) {
+  const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    setCountdown(autoAdvanceSecs)
-  }, [question.id, autoAdvanceSecs])
-
-  useEffect(() => {
-    if (countdown <= 0) {
-      onBegin()
-      return
+    if (!introStartedAt) return
+    const tick = () => {
+      const elapsed = Date.now() - new Date(introStartedAt).getTime()
+      setProgress(Math.min(1, elapsed / INTRO_DURATION_MS))
     }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
-  }, [countdown, onBegin])
+    tick()
+    const interval = setInterval(tick, 100)
+    return () => clearInterval(interval)
+  }, [introStartedAt])
+
+  const secondsLeft = introStartedAt
+    ? Math.max(0, Math.ceil((INTRO_DURATION_MS - (Date.now() - new Date(introStartedAt).getTime())) / 1000))
+    : INTRO_DURATION_MS / 1000
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col items-center justify-center font-[var(--font-nunito)]">
-      <div className="text-center px-8 max-w-3xl w-full">
-        {/* Label */}
+      <div id="host-action-btn" className="text-center px-8 max-w-3xl w-full">
         <p className="text-white/40 text-sm font-semibold uppercase tracking-[0.3em] mb-6">
           Next Section
         </p>
-
-        {/* Section name */}
         <h1 className="text-7xl font-extrabold text-white mb-4 leading-tight">
-          {question.section_title}
+          {sectionTitle}
         </h1>
-
-        {/* Divider */}
         <div className="w-24 h-1 bg-violet-400/60 rounded-full mx-auto mb-10" />
-
-        {/* Countdown ring + button */}
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-4">
+          {/* Progress ring */}
           <div className="relative w-24 h-24">
             <svg className="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
               <circle cx="48" cy="48" r="40" fill="none" stroke="white" strokeOpacity="0.1" strokeWidth="6" />
@@ -58,29 +48,16 @@ export default function HostSectionIntro({
                 stroke="rgb(167 139 250)"
                 strokeWidth="6"
                 strokeDasharray={`${2 * Math.PI * 40}`}
-                strokeDashoffset={`${2 * Math.PI * 40 * (1 - countdown / autoAdvanceSecs)}`}
+                strokeDashoffset={`${2 * Math.PI * 40 * (1 - progress)}`}
                 strokeLinecap="round"
-                className="transition-all duration-1000 ease-linear"
+                className="transition-all duration-100 ease-linear"
               />
             </svg>
             <span className="absolute inset-0 flex items-center justify-center text-white text-3xl font-extrabold">
-              {countdown}
+              {secondsLeft}
             </span>
           </div>
-
-          <button
-            id="host-action-btn"
-            onClick={onBegin}
-            disabled={isBeginning}
-            className={[
-              'px-10 py-4 rounded-2xl text-white text-xl font-extrabold shadow-xl transition-all duration-200',
-              !isBeginning
-                ? 'bg-gradient-to-r from-purple-500 to-violet-400 hover:from-purple-400 hover:to-violet-300 hover:scale-105 active:scale-95 cursor-pointer'
-                : 'bg-gray-600 opacity-60 cursor-not-allowed',
-            ].join(' ')}
-          >
-            {isBeginning ? 'Starting…' : 'Begin Section →'}
-          </button>
+          <p className="text-white/50 text-lg font-semibold">Starting soon…</p>
         </div>
       </div>
     </div>

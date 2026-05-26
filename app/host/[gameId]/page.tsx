@@ -276,6 +276,13 @@ export default function HostGamePage() {
     return () => clearTimeout(timeout)
   }, [session?.game_state, gameId, fetchGameState])
 
+  // Poll every second during section_intro so server-side auto-transition fires promptly
+  useEffect(() => {
+    if (session?.game_state !== 'section_intro') return
+    const interval = setInterval(fetchGameState, 1000)
+    return () => clearInterval(interval)
+  }, [session?.game_state, fetchGameState])
+
   // -------- Render --------
 
   if (isLoading) {
@@ -328,10 +335,8 @@ export default function HostGamePage() {
     case 'section_intro':
       if (question) content = (
         <HostSectionIntro
-          question={question}
-          onBegin={handleBeginSection}
-          isBeginning={isActionPending}
-          autoAdvanceSecs={5}
+          sectionTitle={question.section_title ?? ''}
+          introStartedAt={session.section_intro_at ?? null}
         />
       )
       break

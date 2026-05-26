@@ -263,6 +263,7 @@ export async function POST(
             current_question_index: nextIndex,
             question_started_at: null,
             correct_answer_id: null,
+            section_intro_at: now,
           })
           .eq('id', gameId)
 

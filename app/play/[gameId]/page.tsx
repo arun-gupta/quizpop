@@ -650,6 +650,21 @@ export default function PlayPage() {
     }
   }, [gameId, fetchGameState])
 
+  // Poll every second during section_intro so the server-side auto-transition fires promptly
+  useEffect(() => {
+    if (session?.game_state !== 'section_intro') return
+    const raw = localStorage.getItem(`playerData_${gameId}`)
+    if (!raw) return
+    let playerId: string
+    try {
+      playerId = JSON.parse(raw).playerId
+    } catch {
+      return
+    }
+    const interval = setInterval(() => fetchGameState(playerId), 1000)
+    return () => clearInterval(interval)
+  }, [session?.game_state, gameId, fetchGameState])
+
   async function submitAnswer(answerId: string) {
     if (isSubmitting || !session?.question_started_at) return
 
