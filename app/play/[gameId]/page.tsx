@@ -650,9 +650,10 @@ export default function PlayPage() {
     }
   }, [gameId, fetchGameState])
 
-  // Poll every second during section_intro so the server-side auto-transition fires promptly
+  // Poll every second during timed states so server-side auto-transitions fire promptly
   useEffect(() => {
-    if (session?.game_state !== 'section_intro') return
+    const timedStates = ['section_intro', 'question_active', 'question_results', 'leaderboard']
+    if (!session?.game_state || !timedStates.includes(session.game_state)) return
     const raw = localStorage.getItem(`playerData_${gameId}`)
     if (!raw) return
     let playerId: string

@@ -16,8 +16,6 @@ interface HostQuestionProps {
   question: PublicQuestion
   players: Player[]
   responses: number
-  onReveal: () => void
-  isRevealing: boolean
   questionStartedAt: string | null
 }
 
@@ -25,8 +23,6 @@ export default function HostQuestion({
   question,
   players,
   responses,
-  onReveal,
-  isRevealing,
   questionStartedAt,
 }: HostQuestionProps) {
   const [secondsLeft, setSecondsLeft] = useState(question.timer_seconds)
@@ -51,9 +47,6 @@ export default function HostQuestion({
     const interval = setInterval(tick, 250)
     return () => clearInterval(interval)
   }, [questionStartedAt, question.timer_seconds])
-
-  const allAnswered = players.length > 0 && responses >= players.length
-  const timedOut = secondsLeft <= 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
@@ -146,31 +139,9 @@ export default function HostQuestion({
           />
         </div>
 
-        <button
-          onClick={onReveal}
-          disabled={isRevealing}
-          className={[
-            'px-8 py-4 rounded-2xl text-white text-xl font-extrabold',
-            'transition-all duration-200 shadow-xl',
-            !isRevealing
-              ? 'bg-gradient-to-r from-purple-500 to-violet-400 hover:from-purple-400 hover:to-violet-300 hover:scale-105 active:scale-95 cursor-pointer'
-              : 'bg-gray-600 opacity-60 cursor-not-allowed',
-          ].join(' ')}
-        >
-          {isRevealing ? (
-            <span className="flex items-center gap-2">
-              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
-              Revealing...
-            </span>
-          ) : allAnswered || timedOut ? (
-            '📊 Reveal Answers'
-          ) : (
-            '📊 Reveal Answers'
-          )}
-        </button>
+        <p className="text-white/50 text-sm font-semibold">
+          Results reveal automatically when the timer ends
+        </p>
       </div>
     </div>
   )

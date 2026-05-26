@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type {
@@ -33,16 +33,10 @@ export default function HostGamePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isActionPending, setIsActionPending] = useState(false)
-  const [totalQuestions, setTotalQuestions] = useState(0)
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false)
 
-  // Track current question id to reset response counts properly
-  const currentQuestionIdRef = useRef<string | null>(null)
-  // Stable ref so timer callbacks always use the latest hostToken
-  const hostTokenRef = useRef(hostToken)
-
-  // Keep ref in sync so timer callbacks always see the latest value
-  hostTokenRef.current = hostToken
+  // Track current question id to reset response counts when question changes
+  const currentQuestionIdRef = React.useRef<string | null>(null)
 
   // Load host token from localStorage
   useEffect(() => {
@@ -54,7 +48,7 @@ export default function HostGamePage() {
     setHostToken(token)
   }, [gameId, router])
 
-  // Fetch initial game state
+  // Fetch game state from server (server handles all auto-transitions)
   const fetchGameState = useCallback(async () => {
     if (!hostToken) return
     try {
@@ -89,27 +83,9 @@ export default function HostGamePage() {
     }
   }, [gameId, hostToken, router])
 
-  // Fetch total question count once
-  const fetchTotalQuestions = useCallback(async () => {
-    if (!hostToken || !session?.quiz_id) return
-    try {
-      const res = await fetch(`/api/admin/quizzes/${session.quiz_id}`)
-      if (res.ok) {
-        const data = await res.json()
-        setTotalQuestions(data.questions?.length ?? data.question_count ?? 0)
-      }
-    } catch {
-      // non-critical, ignore
-    }
-  }, [hostToken, session?.quiz_id])
-
   useEffect(() => {
     if (hostToken) fetchGameState()
   }, [hostToken, fetchGameState])
-
-  useEffect(() => {
-    if (session?.quiz_id && totalQuestions === 0) fetchTotalQuestions()
-  }, [session?.quiz_id, totalQuestions, fetchTotalQuestions])
 
   // Subscribe to Supabase Realtime
   useEffect(() => {
@@ -186,7 +162,15 @@ export default function HostGamePage() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // -------- Action helpers (call API then refresh state) --------
+  // Poll every second during timed states so server auto-transitions fire promptly
+  useEffect(() => {
+    const timedStates = ['section_intro', 'question_active', 'question_results', 'leaderboard']
+    if (!session?.game_state || !timedStates.includes(session.game_state)) return
+    const interval = setInterval(fetchGameState, 1000)
+    return () => clearInterval(interval)
+  }, [session?.game_state, fetchGameState])
+
+  // -------- Action helpers --------
 
   async function callHostAction(path: string, extraBody: Record<string, unknown> = {}) {
     if (isActionPending || !hostToken) return
@@ -210,78 +194,10 @@ export default function HostGamePage() {
   }
 
   const handleStart = useCallback(() => callHostAction('start'), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
-  const handleReveal = useCallback(() => callHostAction('next', { action: 'reveal' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
-  const handleShowLeaderboard = useCallback(() => callHostAction('next', { action: 'leaderboard' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
-  const handleNextQuestion = useCallback(() => callHostAction('next', { action: 'next' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
-  const handleBeginSection = useCallback(() => callHostAction('next', { action: 'begin_section' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
   const handleFinishGame = useCallback(() => {
     setShowEndGameConfirm(false)
     callHostAction('next', { action: 'finish' })
   }, [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Timer expiry auto-reveal: when the question timer runs out, reveal automatically
-  useEffect(() => {
-    if (session?.game_state !== 'question_active' || !session.question_started_at || !question?.timer_seconds) return
-
-    const startedAt = new Date(session.question_started_at).getTime()
-    const timeLimitMs = question.timer_seconds * 1000
-    const remaining = timeLimitMs - (Date.now() - startedAt)
-
-    const triggerReveal = () => {
-      fetch(`/api/game/${gameId}/next`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hostToken: hostTokenRef.current, action: 'reveal' }),
-      })
-        .then(() => fetchGameState())
-        .catch(() => {})
-    }
-
-    if (remaining <= 0) {
-      triggerReveal()
-      return
-    }
-
-    const timeout = setTimeout(triggerReveal, remaining)
-    return () => clearTimeout(timeout)
-  }, [session?.game_state, session?.question_started_at, question?.id, question?.timer_seconds, gameId, fetchGameState])
-
-  // Auto-advance to leaderboard 5s after question results are shown
-  useEffect(() => {
-    if (session?.game_state !== 'question_results') return
-    const timeout = setTimeout(() => {
-      fetch(`/api/game/${gameId}/next`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hostToken: hostTokenRef.current, action: 'leaderboard' }),
-      })
-        .then(() => fetchGameState())
-        .catch(() => {})
-    }, 5000)
-    return () => clearTimeout(timeout)
-  }, [session?.game_state, gameId, fetchGameState])
-
-  // Auto-advance from leaderboard to next question (or finished) after 8s
-  useEffect(() => {
-    if (session?.game_state !== 'leaderboard') return
-    const timeout = setTimeout(() => {
-      fetch(`/api/game/${gameId}/next`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ hostToken: hostTokenRef.current, action: 'next' }),
-      })
-        .then(() => fetchGameState())
-        .catch(() => {})
-    }, 8000)
-    return () => clearTimeout(timeout)
-  }, [session?.game_state, gameId, fetchGameState])
-
-  // Poll every second during section_intro so server-side auto-transition fires promptly
-  useEffect(() => {
-    if (session?.game_state !== 'section_intro') return
-    const interval = setInterval(fetchGameState, 1000)
-    return () => clearInterval(interval)
-  }, [session?.game_state, fetchGameState])
 
   // -------- Render --------
 
@@ -315,10 +231,6 @@ export default function HostGamePage() {
 
   if (!session) return null
 
-  const isLastQuestion = totalQuestions > 0
-    ? session.current_question_index >= totalQuestions - 1
-    : false
-
   let content: React.ReactNode = null
   switch (session.game_state) {
     case 'lobby':
@@ -347,8 +259,6 @@ export default function HostGamePage() {
           question={question}
           players={players}
           responses={responseCount}
-          onReveal={handleReveal}
-          isRevealing={isActionPending}
           questionStartedAt={session.question_started_at}
         />
       )
@@ -362,7 +272,6 @@ export default function HostGamePage() {
           players={players}
           answerDistribution={answerDistribution}
           wordCloud={wordCloud}
-          onLeaderboard={handleShowLeaderboard}
           autoAdvanceSecs={5}
         />
       )
@@ -372,9 +281,6 @@ export default function HostGamePage() {
       content = (
         <HostLeaderboard
           entries={leaderboard}
-          onNext={handleNextQuestion}
-          isLastQuestion={isLastQuestion}
-          isAdvancing={isActionPending}
           autoAdvanceSecs={8}
         />
       )

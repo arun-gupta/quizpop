@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     // Find game session by join code (case-insensitive)
     const { data: session, error: sessionError } = await supabase
       .from('game_sessions')
-      .select('id, quiz_id, join_code, game_state, current_question_index, question_started_at, section_intro_at, correct_answer_id, started_at, completed_at, created_at')
+      .select('id, quiz_id, join_code, game_state, current_question_index, question_started_at, section_intro_at, state_changed_at, correct_answer_id, started_at, completed_at, created_at')
       .ilike('join_code', joinCode.trim().toUpperCase())
       .maybeSingle()
 

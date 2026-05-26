@@ -73,6 +73,7 @@ export async function POST(
         current_question_index: 0,
         started_at: now,
         question_started_at: now,
+        state_changed_at: now,
       })
       .eq('id', gameId)
 

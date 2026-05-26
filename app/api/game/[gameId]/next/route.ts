@@ -92,12 +92,15 @@ export async function POST(
         correctAnswerId = correctOption.id
       }
 
+      const now = new Date().toISOString()
+
       // Transition to question_results
       const { error: updateError } = await supabase
         .from('game_sessions')
         .update({
           game_state: 'question_results',
           correct_answer_id: correctAnswerId,
+          state_changed_at: now,
         })
         .eq('id', gameId)
 
@@ -182,10 +185,12 @@ export async function POST(
         // Non-fatal: continue even if snapshot fails
       }
 
+      const now = new Date().toISOString()
+
       // Transition to leaderboard state
       const { error: updateError } = await supabase
         .from('game_sessions')
-        .update({ game_state: 'leaderboard' })
+        .update({ game_state: 'leaderboard', state_changed_at: now })
         .eq('id', gameId)
 
       if (updateError) {
@@ -264,6 +269,7 @@ export async function POST(
             question_started_at: null,
             correct_answer_id: null,
             section_intro_at: now,
+            state_changed_at: now,
           })
           .eq('id', gameId)
 
@@ -283,6 +289,7 @@ export async function POST(
           current_question_index: nextIndex,
           question_started_at: now,
           correct_answer_id: null,
+          state_changed_at: now,
         })
         .eq('id', gameId)
 
@@ -320,6 +327,7 @@ export async function POST(
         .update({
           game_state: 'question_active',
           question_started_at: now,
+          state_changed_at: now,
         })
         .eq('id', gameId)
 

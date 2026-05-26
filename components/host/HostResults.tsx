@@ -17,7 +17,6 @@ interface HostResultsProps {
   players: Player[]
   answerDistribution: Record<string, number>
   wordCloud?: WordCloudEntry[] | null
-  onLeaderboard: () => void
   autoAdvanceSecs?: number
 }
 
@@ -27,7 +26,6 @@ export default function HostResults({
   players,
   answerDistribution,
   wordCloud,
-  onLeaderboard,
   autoAdvanceSecs = 5,
 }: HostResultsProps) {
   const [countdown, setCountdown] = useState(autoAdvanceSecs)
@@ -125,16 +123,10 @@ export default function HostResults({
         </p>
       </div>
 
-      {/* Auto-advance countdown + manual button */}
-      <div className="px-8 pb-8 flex flex-col items-center gap-3">
-        <button
-          onClick={onLeaderboard}
-          className="px-12 py-5 rounded-2xl text-white text-2xl font-extrabold bg-gradient-to-r from-purple-500 to-violet-400 hover:from-purple-400 hover:to-violet-300 hover:scale-105 active:scale-95 transition-all duration-200 shadow-2xl cursor-pointer"
-        >
-          🏆 Show Leaderboard
-        </button>
+      {/* Auto-advance countdown */}
+      <div className="px-8 pb-8 flex flex-col items-center gap-2">
         <p className="text-white/40 text-sm font-semibold">
-          Auto-advancing in {countdown}s…
+          Leaderboard in {countdown}s…
         </p>
       </div>
     </div>

@@ -5,7 +5,7 @@ describe('parseQuizMarkdown', () => {
   it('parses a minimal valid quiz', () => {
     const md = `# My Quiz
 
-## What color is the sky?
+### What color is the sky?
 - [ ] Red
 - [x] Blue
 - [ ] Green
@@ -23,7 +23,7 @@ describe('parseQuizMarkdown', () => {
     const md = `# Fun Quiz
 A great quiz for all ages.
 
-## Question?
+### Question?
 - [x] Yes
 - [ ] No
 `
@@ -36,7 +36,7 @@ A great quiz for all ages.
   it('parses metadata: timer and points', () => {
     const md = `# Quiz
 
-## Hard question?
+### Hard question?
 > timer: 10 | points: 2000
 - [x] Right
 - [ ] Wrong
@@ -50,7 +50,7 @@ A great quiz for all ages.
   it('parses metadata with only timer', () => {
     const md = `# Quiz
 
-## Question
+### Question
 > timer: 30
 - [x] A
 - [ ] B
@@ -63,7 +63,7 @@ A great quiz for all ages.
   it('defaults timer to 20 and points to 1000', () => {
     const md = `# Quiz
 
-## Question
+### Question
 - [x] A
 - [ ] B
 `
@@ -75,16 +75,16 @@ A great quiz for all ages.
   it('parses multiple questions', () => {
     const md = `# Quiz
 
-## Q1?
+### Q1?
 - [x] A
 - [ ] B
 
-## Q2?
+### Q2?
 - [ ] X
 - [x] Y
 - [ ] Z
 
-## Q3?
+### Q3?
 - [ ] 1
 - [ ] 2
 - [ ] 3
@@ -102,7 +102,7 @@ A great quiz for all ages.
   it('accepts uppercase [X] as correct answer', () => {
     const md = `# Quiz
 
-## Question
+### Question
 - [X] Correct
 - [ ] Wrong
 `
@@ -111,8 +111,30 @@ A great quiz for all ages.
     expect(result.questions[0].answer_options[0].is_correct).toBe(true)
   })
 
+  it('parses sections and assigns section_title to questions', () => {
+    const md = `# Quiz
+
+## Section One
+
+### Q1?
+- [x] A
+- [ ] B
+
+## Section Two
+
+### Q2?
+- [x] C
+- [ ] D
+`
+    const result = parseQuizMarkdown(md)
+    expect(result.errors).toHaveLength(0)
+    expect(result.questions).toHaveLength(2)
+    expect(result.questions[0].section_title).toBe('Section One')
+    expect(result.questions[1].section_title).toBe('Section Two')
+  })
+
   it('errors on missing title', () => {
-    const md = `## Question
+    const md = `### Question
 - [x] A
 - [ ] B
 `
@@ -130,7 +152,7 @@ A great quiz for all ages.
   it('errors on question with no correct answer', () => {
     const md = `# Quiz
 
-## Question?
+### Question?
 - [ ] A
 - [ ] B
 `
@@ -142,7 +164,7 @@ A great quiz for all ages.
   it('errors on question with multiple correct answers', () => {
     const md = `# Quiz
 
-## Question?
+### Question?
 - [x] A
 - [x] B
 - [ ] C
@@ -155,7 +177,7 @@ A great quiz for all ages.
   it('errors on too few options', () => {
     const md = `# Quiz
 
-## Question?
+### Question?
 - [x] Only one option
 `
     const result = parseQuizMarkdown(md)
@@ -165,7 +187,7 @@ A great quiz for all ages.
   it('errors on too many options', () => {
     const md = `# Quiz
 
-## Question?
+### Question?
 - [x] A
 - [ ] B
 - [ ] C
@@ -179,11 +201,11 @@ A great quiz for all ages.
   it('skips invalid questions but keeps valid ones', () => {
     const md = `# Quiz
 
-## Bad question (no correct)
+### Bad question (no correct)
 - [ ] A
 - [ ] B
 
-## Good question
+### Good question
 - [x] Right
 - [ ] Wrong
 `
@@ -196,17 +218,17 @@ A great quiz for all ages.
   it('parses the built-in example without errors', () => {
     const result = parseQuizMarkdown(generateExampleMarkdown())
     expect(result.errors).toHaveLength(0)
-    expect(result.questions).toHaveLength(4)
+    expect(result.questions).toHaveLength(5)
   })
 
   it('assigns correct display_order to questions', () => {
     const md = `# Quiz
 
-## First
+### First
 - [x] A
 - [ ] B
 
-## Second
+### Second
 - [ ] A
 - [x] B
 `
@@ -218,7 +240,7 @@ A great quiz for all ages.
   it('assigns correct display_order to answer options', () => {
     const md = `# Quiz
 
-## Question
+### Question
 - [ ] First
 - [x] Second
 - [ ] Third

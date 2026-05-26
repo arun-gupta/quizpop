@@ -45,6 +45,7 @@ export interface GameSession {
   current_question_index: number
   question_started_at: string | null
   section_intro_at: string | null
+  state_changed_at: string | null
   correct_answer_id: string | null
   started_at: string | null
   completed_at: string | null
