@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Upload, FileText, AlertCircle, CheckCircle, AlertTriangle, X, Copy, Database } from 'lucide-react'
 import { parseQuizMarkdown, generateExampleMarkdown } from '@/lib/quiz-markdown'
 import type { ParsedQuiz } from '@/lib/quiz-markdown'
@@ -20,10 +20,11 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
   const [fetchError, setFetchError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const handlePreview = () => {
-    if (!markdown.trim()) return
-    setPreview(parseQuizMarkdown(markdown))
-  }
+  useEffect(() => {
+    if (!markdown.trim()) { setPreview(null); return }
+    const t = setTimeout(() => setPreview(parseQuizMarkdown(markdown)), 400)
+    return () => clearTimeout(t)
+  }, [markdown])
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -113,17 +114,10 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
           </div>
           <textarea
             value={markdown}
-            onChange={e => { setMarkdown(e.target.value); setPreview(null) }}
+            onChange={e => setMarkdown(e.target.value)}
             placeholder={`# My Quiz\nA fun quiz for all ages!\n\n## What color is the sky?\n- [ ] Red\n- [x] Blue\n- [ ] Green`}
             className="flex-1 min-h-[220px] bg-gray-900 border border-gray-600 rounded-lg p-3 text-sm text-gray-100 font-mono resize-none focus:outline-none focus:border-purple-500 placeholder:text-gray-600"
           />
-          <button
-            onClick={handlePreview}
-            disabled={!markdown.trim()}
-            className="self-start px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 disabled:opacity-40 rounded-lg transition-colors"
-          >
-            Validate
-          </button>
         </div>
       )}
 
