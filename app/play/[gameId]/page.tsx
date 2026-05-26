@@ -131,7 +131,7 @@ function PlayerQuestion({ session, question, player, onAnswer, onTextAnswer, isS
           <p className="text-2xl font-extrabold text-white leading-snug">
             {question.question_text}
           </p>
-          {question.image_url && (
+          {question.image_url && question.image_reveal !== 'after' && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={question.image_url}
@@ -295,6 +295,16 @@ function PlayerResults({ question, player, selectedAnswerId, selectedText, corre
         <h2 className={`text-4xl font-black ${isOpenText ? 'text-violet-300' : !selectedAnswerId ? 'text-yellow-400' : isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
           {isOpenText ? 'Answered!' : !selectedAnswerId ? 'Too slow!' : isCorrect ? 'Correct!' : 'Wrong!'}
         </h2>
+
+        {/* Reveal image shown on results (reveal: after) */}
+        {question.image_url && question.image_reveal === 'after' && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={question.image_url}
+            alt="Reveal"
+            className="mx-auto max-h-48 rounded-2xl object-contain shadow-xl"
+          />
+        )}
 
         {/* Open text: show what the player typed */}
         {isOpenText && selectedText && (
