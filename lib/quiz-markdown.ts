@@ -50,9 +50,9 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
     result.errors.push('Quiz title is required — add a line like: # My Quiz Title')
   }
 
-  // Optional description: next non-empty lines before first ##
+  // Optional description: next non-empty lines before first ## or ###
   const descLines: string[] = []
-  while (i < lines.length && !lines[i].trim().startsWith('## ')) {
+  while (i < lines.length && !lines[i].trim().startsWith('## ') && !lines[i].trim().startsWith('### ')) {
     const line = lines[i].trim()
     if (line && !line.startsWith('#')) descLines.push(line)
     i++
@@ -60,6 +60,8 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
   result.description = descLines.join(' ').trim()
 
   // Parse questions
+  // ## Section Name  — sets the section label for subsequent questions
+  // ### Question text — individual question
   let currentSection: string | undefined = undefined
   let currentQuestion: (Omit<ParsedQuestion, 'display_order'> & { display_order: number }) | null = null
 
@@ -81,15 +83,17 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
     const line = raw.trim()
     i++
 
-    if (line.startsWith('### ')) {
-      currentSection = line.slice(4).trim() || undefined
+    if (line.startsWith('## ')) {
+      flushQuestion()
+      currentSection = line.slice(3).trim() || undefined
+      currentQuestion = null
       continue
     }
 
-    if (line.startsWith('## ')) {
+    if (line.startsWith('### ')) {
       flushQuestion()
       currentQuestion = {
-        question_text: line.slice(3).trim(),
+        question_text: line.slice(4).trim(),
         image_url: undefined,
         timer_seconds: DEFAULT_TIMER,
         points: DEFAULT_POINTS,
@@ -150,7 +154,7 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
   flushQuestion()
 
   if (result.questions.length === 0 && result.errors.length === 0) {
-    result.errors.push('No valid questions found — add questions with "## Question text"')
+    result.errors.push('No valid questions found — add questions with "### Question text"')
   }
 
   // Warnings for unusual timer/points values
@@ -205,34 +209,40 @@ export function generateExampleMarkdown(): string {
   return `# Birthday Party Trivia
 Fun questions for all ages — perfect for parties!
 
-## What is the capital of France?
+## Geography
+
+### What is the capital of France?
 - [ ] London
 - [x] Paris
 - [ ] Berlin
 - [ ] Rome
 
-## How many legs does a spider have?
+## Nature
+
+### How many legs does a spider have?
 > timer: 15 | points: 500
 - [ ] 6
 - [x] 8
 - [ ] 10
 - [ ] 4
 
-## Which planet is known as the Red Planet?
+### Which planet is known as the Red Planet?
 > image: https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/240px-OSIRIS_Mars_true_color.jpg
 - [ ] Jupiter
 - [ ] Venus
 - [x] Mars
 - [ ] Saturn
 
-## What is the fastest land animal?
+### What is the fastest land animal?
 > points: 1000
 - [x] Cheetah
 - [ ] Lion
 - [ ] Greyhound
 - [ ] Peregrine Falcon
 
-## What's your favourite thing about this party?
+## Reflections
+
+### What's your favourite thing about this party?
 > type: open_text | timer: 30 | points: 500
 `
 }

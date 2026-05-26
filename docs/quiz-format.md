@@ -8,17 +8,21 @@ QuizPop can import quizzes from plain Markdown files. This format is designed to
 # Quiz Title
 Optional one-line description.
 
-## Question text goes here?
+## Section Name
+
+### Question text goes here?
 - [ ] Wrong answer
 - [x] Correct answer
 - [ ] Another wrong answer
 - [ ] One more option
 
-## Next question?
+### Next question?
 - [x] Right!
 - [ ] Nope
 - [ ] Not this
 ```
+
+Sections (`##`) are optional — questions without a preceding section header have no section label.
 
 ## Syntax Reference
 
@@ -26,20 +30,22 @@ Optional one-line description.
 |---------|--------|-------|
 | Quiz title | `# My Title` | Required, first line |
 | Description | Plain text after title | Optional |
-| Question | `## Question text?` | Starts a new question |
+| Section | `## Section Name` | Optional grouping label shown during gameplay |
+| Question | `### Question text?` | Starts a new question |
 | Correct answer | `- [x] Answer text` | Exactly 1 per question |
 | Wrong answer | `- [ ] Answer text` | 1–3 per question (2–4 total) |
 | Timer override | `> timer: 15` | After question line, seconds (default: 20) |
 | Points override | `> points: 500` | After question line (default: 1000) |
 | Image | `> image: https://...` | After question line, public image URL |
 | Image (alt) | `![alt](https://...)` | Standard Markdown image syntax |
+| Open text | `> type: open_text` | Free-text answer, shown as word cloud |
 
 ## Custom Timer and Points
 
 Add a `>` line directly after the question to override defaults:
 
 ```markdown
-## What year did World War II end?
+### What year did World War II end?
 > timer: 30 | points: 2000
 - [ ] 1943
 - [ ] 1944
@@ -60,6 +66,7 @@ You can set just one or both:
 - Questions have a default timer of **20 seconds** and **1000 points**
 - Answer options are shown in the order listed in the file
 - Blank lines between questions are ignored
+- `open_text` questions must have no answer options
 
 ## Full Example
 
@@ -67,32 +74,41 @@ You can set just one or both:
 # Birthday Party Trivia
 Fun questions for the whole family!
 
-## What is the capital of France?
+## Geography
+
+### What is the capital of France?
 - [ ] London
 - [x] Paris
 - [ ] Berlin
 - [ ] Rome
 
-## How many legs does a spider have?
+## Nature
+
+### How many legs does a spider have?
 > timer: 15 | points: 500
 - [ ] 6
 - [x] 8
 - [ ] 10
 - [ ] 4
 
-## Which planet is known as the Red Planet?
+### Which planet is known as the Red Planet?
 > image: https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/OSIRIS_Mars_true_color.jpg/240px-OSIRIS_Mars_true_color.jpg
 - [ ] Jupiter
 - [ ] Venus
 - [x] Mars
 - [ ] Saturn
 
-## What year was the first iPhone released?
+### What year was the first iPhone released?
 > timer: 20 | points: 2000
 - [ ] 2005
 - [x] 2007
 - [ ] 2009
 - [ ] 2003
+
+## Reflections
+
+### What's your favourite memory from tonight?
+> type: open_text | timer: 30 | points: 500
 ```
 
 ## How to Import
