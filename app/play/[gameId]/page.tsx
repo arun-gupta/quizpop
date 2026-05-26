@@ -10,6 +10,7 @@ import type {
   LeaderboardEntry,
   PlayerResponse,
 } from '@/types/database'
+import PlayerSectionIntro from '@/components/player/PlayerSectionIntro'
 
 // --------------- Sub-components ---------------
 
@@ -735,6 +736,11 @@ export default function PlayPage() {
 
   if (gameState === 'lobby') {
     return <PlayerLobby session={session} player={player} />
+  }
+
+  if (gameState === 'section_intro') {
+    const sectionTitle = question?.section_title ?? 'Next Section'
+    return <PlayerSectionIntro sectionTitle={sectionTitle} />
   }
 
   if (gameState === 'question_active') {

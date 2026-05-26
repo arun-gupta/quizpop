@@ -1,4 +1,4 @@
-export type GameState = 'lobby' | 'question_active' | 'question_results' | 'leaderboard' | 'finished'
+export type GameState = 'lobby' | 'question_active' | 'question_results' | 'leaderboard' | 'section_intro' | 'finished'
 
 export type QuestionType = 'multiple_choice' | 'open_text'
 

@@ -14,6 +14,7 @@ import HostLobby from '@/components/host/HostLobby'
 import HostQuestion from '@/components/host/HostQuestion'
 import HostResults from '@/components/host/HostResults'
 import HostLeaderboard from '@/components/host/HostLeaderboard'
+import HostSectionIntro from '@/components/host/HostSectionIntro'
 import HostFinished from '@/components/host/HostFinished'
 
 export default function HostGamePage() {
@@ -212,6 +213,7 @@ export default function HostGamePage() {
   const handleReveal = useCallback(() => callHostAction('next', { action: 'reveal' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
   const handleShowLeaderboard = useCallback(() => callHostAction('next', { action: 'leaderboard' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
   const handleNextQuestion = useCallback(() => callHostAction('next', { action: 'next' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
+  const handleBeginSection = useCallback(() => callHostAction('next', { action: 'begin_section' }), [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
   const handleFinishGame = useCallback(() => {
     setShowEndGameConfirm(false)
     callHostAction('next', { action: 'finish' })
@@ -319,6 +321,17 @@ export default function HostGamePage() {
           players={players}
           onStart={handleStart}
           isStarting={isActionPending}
+        />
+      )
+      break
+
+    case 'section_intro':
+      if (question) content = (
+        <HostSectionIntro
+          question={question}
+          onBegin={handleBeginSection}
+          isBeginning={isActionPending}
+          autoAdvanceSecs={5}
         />
       )
       break

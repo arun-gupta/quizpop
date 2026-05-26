@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import type { LeaderboardEntry } from '@/types/database'
 
-type NextAction = 'reveal' | 'leaderboard' | 'next' | 'finish'
+type NextAction = 'reveal' | 'leaderboard' | 'next' | 'begin_section' | 'finish'
 
 export async function POST(
   req: NextRequest,
@@ -21,7 +21,7 @@ export async function POST(
       return NextResponse.json({ error: 'hostToken required' }, { status: 400 })
     }
 
-    const validActions: NextAction[] = ['reveal', 'leaderboard', 'next', 'finish']
+    const validActions: NextAction[] = ['reveal', 'leaderboard', 'next', 'begin_section', 'finish']
     if (!action || !validActions.includes(action)) {
       return NextResponse.json(
         { error: `action must be one of: ${validActions.join(', ')}` },
@@ -197,7 +197,7 @@ export async function POST(
     }
 
     // -------------------------------------------------------------------------
-    // Action: 'next' — leaderboard → question_active OR finished
+    // Action: 'next' — leaderboard → section_intro OR question_active OR finished
     // -------------------------------------------------------------------------
     if (action === 'next') {
       if (session.game_state !== 'leaderboard') {
@@ -207,19 +207,20 @@ export async function POST(
         )
       }
 
-      // Get total question count
-      const { count: totalQuestions, error: countError } = await supabase
+      // Fetch all questions (id + section_title) to detect section changes
+      const { data: questions, error: questionsError } = await supabase
         .from('questions')
-        .select('id', { count: 'exact', head: true })
+        .select('id, section_title')
         .eq('quiz_id', session.quiz_id)
+        .order('display_order', { ascending: true })
 
-      if (countError || totalQuestions === null) {
-        console.error('Question count error:', countError)
-        return NextResponse.json({ error: 'Failed to get question count' }, { status: 500 })
+      if (questionsError || !questions) {
+        console.error('Questions fetch error:', questionsError)
+        return NextResponse.json({ error: 'Failed to fetch questions' }, { status: 500 })
       }
 
       const nextIndex = session.current_question_index + 1
-      const isLastQuestion = nextIndex >= totalQuestions
+      const isLastQuestion = nextIndex >= questions.length
 
       const now = new Date().toISOString()
 
@@ -238,11 +239,10 @@ export async function POST(
           return NextResponse.json({ error: 'Failed to finish game' }, { status: 500 })
         }
 
-        // Log analytics (best-effort)
         supabase.from('analytics_events').insert({
           event_type: 'game_finished',
           game_session_id: gameId,
-          metadata: { total_questions: totalQuestions, completed_at: now },
+          metadata: { total_questions: questions.length, completed_at: now },
         }).then(({ error }) => {
           if (error) console.warn('Analytics event failed:', error.message)
         })
@@ -250,7 +250,31 @@ export async function POST(
         return NextResponse.json({ success: true, gameState: 'finished' })
       }
 
-      // Advance to next question
+      const currentSection = questions[session.current_question_index]?.section_title ?? null
+      const nextSection = questions[nextIndex]?.section_title ?? null
+      const isNewSection = nextSection !== null && nextSection !== currentSection
+
+      if (isNewSection) {
+        // New section — pause at section_intro so host can introduce it
+        const { error: updateError } = await supabase
+          .from('game_sessions')
+          .update({
+            game_state: 'section_intro',
+            current_question_index: nextIndex,
+            question_started_at: null,
+            correct_answer_id: null,
+          })
+          .eq('id', gameId)
+
+        if (updateError) {
+          console.error('Session update error:', updateError)
+          return NextResponse.json({ error: 'Failed to advance to section intro' }, { status: 500 })
+        }
+
+        return NextResponse.json({ success: true, gameState: 'section_intro', questionIndex: nextIndex })
+      }
+
+      // Same section (or no sections) — go directly to question_active
       const { error: updateError } = await supabase
         .from('game_sessions')
         .update({
@@ -266,7 +290,6 @@ export async function POST(
         return NextResponse.json({ error: 'Failed to advance to next question' }, { status: 500 })
       }
 
-      // Log analytics (best-effort)
       supabase.from('analytics_events').insert({
         event_type: 'question_started',
         game_session_id: gameId,
@@ -275,11 +298,44 @@ export async function POST(
         if (error) console.warn('Analytics event failed:', error.message)
       })
 
-      return NextResponse.json({
-        success: true,
-        gameState: 'question_active',
-        questionIndex: nextIndex,
+      return NextResponse.json({ success: true, gameState: 'question_active', questionIndex: nextIndex })
+    }
+
+    // -------------------------------------------------------------------------
+    // Action: 'begin_section' — section_intro → question_active (starts timer)
+    // -------------------------------------------------------------------------
+    if (action === 'begin_section') {
+      if (session.game_state !== 'section_intro') {
+        return NextResponse.json(
+          { error: `Cannot begin section: expected 'section_intro', got '${session.game_state}'` },
+          { status: 409 }
+        )
+      }
+
+      const now = new Date().toISOString()
+
+      const { error: updateError } = await supabase
+        .from('game_sessions')
+        .update({
+          game_state: 'question_active',
+          question_started_at: now,
+        })
+        .eq('id', gameId)
+
+      if (updateError) {
+        console.error('Session update error:', updateError)
+        return NextResponse.json({ error: 'Failed to begin section' }, { status: 500 })
+      }
+
+      supabase.from('analytics_events').insert({
+        event_type: 'question_started',
+        game_session_id: gameId,
+        metadata: { question_index: session.current_question_index },
+      }).then(({ error }) => {
+        if (error) console.warn('Analytics event failed:', error.message)
       })
+
+      return NextResponse.json({ success: true, gameState: 'question_active' })
     }
 
     // -------------------------------------------------------------------------
