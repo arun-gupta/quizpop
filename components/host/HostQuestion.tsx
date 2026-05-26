@@ -49,7 +49,7 @@ export default function HostQuestion({
   }, [questionStartedAt, question.timer_seconds])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       {/* Top bar */}
       <div className="flex items-center justify-between px-8 pt-6 pb-2">
         <div className="text-white/60 text-xl font-semibold">
@@ -87,7 +87,7 @@ export default function HostQuestion({
         {/* Image — only shown before reveal */}
         {question.image_url && question.image_reveal !== 'after' && (
           <div className="flex justify-center flex-shrink-0">
-            <div className="relative h-52 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
+            <div className="relative h-40 w-full max-w-lg rounded-2xl overflow-hidden shadow-xl">
               <Image
                 src={question.image_url}
                 alt="Question image"

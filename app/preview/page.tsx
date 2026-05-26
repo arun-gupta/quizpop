@@ -30,7 +30,7 @@ function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined; buc
   if (!url || failed) {
     return (
       <div className="flex justify-center">
-        <div className="h-52 w-full max-w-lg rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 bg-white/5">
+        <div className="h-40 w-full max-w-lg rounded-2xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center gap-2 bg-white/5">
           <span className="text-4xl">🖼️</span>
           <p className="text-white/40 text-sm font-semibold">{url ? 'Image not found' : 'No bucket configured'}</p>
           <p className="text-white/25 text-xs font-mono">{rawValue}</p>
@@ -43,7 +43,7 @@ function QuestionImage({ rawValue, bucket }: { rawValue: string | undefined; buc
     <div className="flex justify-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url} alt="Question image" onError={() => setFailed(true)}
-        className="h-52 max-w-lg w-full rounded-2xl object-cover shadow-xl" />
+        className="h-40 max-w-lg w-full rounded-2xl object-cover shadow-xl" />
     </div>
   )
 }
@@ -62,7 +62,7 @@ function QuestionCard({ question, index, total, bucket, view }: {
   const showRevealHint = question.image_url && question.image_reveal === 'after' && view === 'question'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       {/* Result banner (results view only) */}
       {view === 'results' && (
         <div className="w-full py-4 text-center bg-gradient-to-r from-green-600 to-emerald-500 shadow-xl">

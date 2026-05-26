@@ -53,7 +53,7 @@ export default function PlayerQuestion({
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
       {/* Timer + question number */}
       <div className="flex items-center justify-between px-4 pt-4 pb-2">
         <div className="text-white/60 text-sm font-semibold">
