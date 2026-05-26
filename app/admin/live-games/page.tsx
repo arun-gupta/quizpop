@@ -9,6 +9,7 @@ interface LiveGame {
   join_code: string
   game_state: string
   current_question_index: number
+  state_changed_at: string | null
   started_at: string | null
   completed_at: string | null
   created_at: string
@@ -18,6 +19,12 @@ interface LiveGame {
 
 const STALE_THRESHOLD_MS = 2 * 60 * 60 * 1000 // 2 hours
 
+function lastActivity(g: LiveGame): number {
+  // Use the most recent known activity timestamp as the stale baseline
+  const ts = g.state_changed_at ?? g.started_at ?? g.created_at
+  return new Date(ts).getTime()
+}
+
 function categorize(games: LiveGame[]) {
   const now = Date.now()
   const active: LiveGame[] = []
@@ -26,7 +33,7 @@ function categorize(games: LiveGame[]) {
   for (const g of games) {
     if (g.game_state === 'finished') {
       past.push(g)
-    } else if (now - new Date(g.created_at).getTime() >= STALE_THRESHOLD_MS) {
+    } else if (now - lastActivity(g) >= STALE_THRESHOLD_MS) {
       stale.push(g)
     } else {
       active.push(g)

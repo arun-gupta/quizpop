@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
         game_state,
         current_question_index,
         question_started_at,
+        state_changed_at,
         started_at,
         completed_at,
         created_at,
@@ -58,6 +59,7 @@ export async function GET(req: NextRequest) {
       game_state: string
       current_question_index: number
       question_started_at: string | null
+      state_changed_at: string | null
       started_at: string | null
       completed_at: string | null
       created_at: string
@@ -73,6 +75,7 @@ export async function GET(req: NextRequest) {
         game_state: gs.game_state,
         current_question_index: gs.current_question_index,
         question_started_at: gs.question_started_at,
+        state_changed_at: gs.state_changed_at,
         started_at: gs.started_at,
         completed_at: gs.completed_at,
         created_at: gs.created_at,
