@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779814830711,
+  "lastUpdate": 1779815448223,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -1469,6 +1469,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 10951,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "390820af1548e4ec0c3999fa9609787daba22830",
+          "message": "feat: allow multiple answers for open-text questions, fix word cloud\n\n- DB: replace broad UNIQUE(player_id, question_id) with a partial index\n  that only enforces uniqueness for MC answers (selected_answer_id not null).\n  Open-text players can now submit multiple answers.\n- API: detect first vs subsequent open-text submission; points awarded only\n  on the first, additional submissions add to word cloud with 0 extra points.\n- Player UI: textarea stays active after each submission so players can keep\n  adding answers; submitted answers listed above the input; Enter key submits.\n- Format guide: document type: open_text and fix the word cloud not\n  showing (quiz must be re-imported with > type: open_text on each question).\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T10:09:34-07:00",
+          "tree_id": "9ff6326fdce4ba4bac4e31e90a5861e3c467b6ce",
+          "url": "https://github.com/arun-gupta/quizpop/commit/390820af1548e4ec0c3999fa9609787daba22830"
+        },
+        "date": 1779815447810,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1553,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2090,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1477,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2398,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1703,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1922,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2397,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3298,
             "unit": "ms"
           }
         ]
