@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779812388395,
+  "lastUpdate": 1779812895031,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -1085,6 +1085,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 2873,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "2a26cf143ff00cd4de72f7d3b4ae8429c5bf0800",
+          "message": "feat: import quiz markdown directly from Supabase Storage bucket\n\nNew 'From Storage' tab in admin import UI. Enter a bucket path\n(e.g. quiz-images/mihir), the server finds the .md file in that\nfolder, downloads it, and populates the preview/import flow.\nImages stay in the same folder and are resolved via the existing\n> bucket: header in the markdown.\n\nAlso fix /quizzes gitignore pattern to not accidentally match\napp/api/admin/quizzes/.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T09:27:06-07:00",
+          "tree_id": "99c6c28133f9cd790b2c5f3642e04e921c3b1af3",
+          "url": "https://github.com/arun-gupta/quizpop/commit/2a26cf143ff00cd4de72f7d3b4ae8429c5bf0800"
+        },
+        "date": 1779812894641,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1556,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 1780,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1732,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2277,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1737,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1918,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2724,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3316,
             "unit": "ms"
           }
         ]
