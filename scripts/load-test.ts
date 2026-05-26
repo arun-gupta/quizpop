@@ -232,6 +232,10 @@ async function main() {
   const revealed = gameState === 'question_results' || gameState === 'leaderboard' || gameState === 'finished'
   console.log(`game_state = ${gameState} ${revealed ? '✓ auto-revealed' : '✗ still question_active'}`)
 
+  // Clean up — mark session finished so it doesn't appear as a stale active game
+  await post(`/api/game/${gameId}/next`, { action: 'finish', hostToken })
+  console.log('  Game session finished (cleanup)')
+
   const joinStats = stats(joinResults.filter(r => r.ok).map(r => r.ms))
   const answerStats = stats(answerResults.filter(r => r.ok).map(r => r.ms))
   const pass = joinResults.every(r => r.ok) && answerResults.filter(r => r.ok).length >= joined * 0.95
