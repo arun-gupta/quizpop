@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 // Pure CSS star positions — no client JS needed
 const STARS = [
@@ -62,20 +63,26 @@ export default function HomePage() {
       {/* Main content */}
       <div className="relative z-10 flex flex-col items-center gap-8 max-w-2xl w-full text-center">
         {/* Logo */}
-        <div className="animate-slide-in-down">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <span className="text-5xl animate-float" style={{ animationDelay: '0s' }}>🎉</span>
+        <div className="animate-slide-in-down flex flex-col items-center gap-3">
+          <Image
+            src="/quizpop-logo.png"
+            alt="QuizPop"
+            width={120}
+            height={120}
+            className="rounded-3xl shadow-2xl animate-float"
+            priority
+          />
+          <div>
             <h1
               className="text-responsive-xl font-black tracking-tight gradient-text"
               style={{ lineHeight: 1.1 }}
             >
               QuizPop
             </h1>
-            <span className="text-5xl animate-float" style={{ animationDelay: '0.5s' }}>🎊</span>
+            <p className="text-2xl sm:text-3xl font-bold text-purple-200 text-shadow mt-1">
+              The party game everyone loves!
+            </p>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-purple-200 text-shadow">
-            The party game everyone loves!
-          </p>
         </div>
 
         {/* Subtitle */}

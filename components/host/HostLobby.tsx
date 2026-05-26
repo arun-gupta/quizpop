@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { GameSession, Player } from '@/types/database'
 import QRCode from '@/components/game/QRCode'
 
@@ -30,11 +31,12 @@ export default function HostLobby({
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col items-center justify-center p-8 font-[var(--font-nunito)]">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-5xl font-extrabold text-white mb-2 tracking-tight drop-shadow-lg">
-          QuizPop!
-        </h1>
-        <p className="text-white/70 text-xl">Join the game on your phone</p>
+      <div className="text-center mb-8 flex flex-col items-center gap-3">
+        <Image src="/quizpop-logo.png" alt="QuizPop" width={72} height={72} className="rounded-2xl shadow-xl" />
+        <div>
+          <h1 className="text-5xl font-extrabold text-white mb-1 tracking-tight drop-shadow-lg">QuizPop!</h1>
+          <p className="text-white/70 text-xl">Join the game on your phone</p>
+        </div>
       </div>
 
       <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
