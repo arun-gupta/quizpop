@@ -122,7 +122,7 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
             disabled={!markdown.trim()}
             className="self-start px-4 py-2 text-sm bg-gray-700 hover:bg-gray-600 disabled:opacity-40 rounded-lg transition-colors"
           >
-            Preview
+            Validate
           </button>
         </div>
       )}
