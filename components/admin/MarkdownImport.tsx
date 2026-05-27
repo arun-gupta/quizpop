@@ -14,6 +14,7 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
   const [markdown, setMarkdown] = useState('')
   const [preview, setPreview] = useState<ParsedQuiz | null>(null)
   const [importing, setImporting] = useState(false)
+  const [overwrite, setOverwrite] = useState(false)
   const [tab, setTab] = useState<'paste' | 'upload' | 'bucket' | 'format'>('paste')
   const [bucketPath, setBucketPath] = useState('')
   const [fetching, setFetching] = useState(false)
@@ -42,7 +43,7 @@ export default function MarkdownImport({ onSuccess, onCancel }: MarkdownImportPr
       const res = await fetch('/api/admin/quizzes/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ markdown }),
+        body: JSON.stringify({ markdown, overwrite }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -279,21 +280,32 @@ Optional description text here.
       )}
 
       {/* Footer actions */}
-      <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-700">
-        <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors">
-          Cancel
-        </button>
-        <button
-          onClick={handleImport}
-          disabled={!preview || preview.errors.length > 0 || importing}
-          className="px-5 py-2 text-sm bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-colors flex items-center gap-2"
-        >
-          {importing ? (
-            <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing…</>
-          ) : (
-            <><FileText size={15} /> Import Quiz</>
-          )}
-        </button>
+      <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-700">
+        <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-gray-400 hover:text-gray-200">
+          <input
+            type="checkbox"
+            checked={overwrite}
+            onChange={e => setOverwrite(e.target.checked)}
+            className="accent-purple-500 w-4 h-4"
+          />
+          Replace existing quiz with same title
+        </label>
+        <div className="flex gap-3">
+          <button onClick={onCancel} className="px-4 py-2 text-sm text-gray-400 hover:text-gray-200 transition-colors">
+            Cancel
+          </button>
+          <button
+            onClick={handleImport}
+            disabled={!preview || preview.errors.length > 0 || importing}
+            className="px-5 py-2 text-sm bg-purple-600 hover:bg-purple-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            {importing ? (
+              <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing…</>
+            ) : (
+              <><FileText size={15} /> {overwrite ? 'Replace Quiz' : 'Import Quiz'}</>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   )

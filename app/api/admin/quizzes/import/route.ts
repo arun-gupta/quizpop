@@ -3,7 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { parseQuizMarkdown } from '@/lib/quiz-markdown'
 
 // POST /api/admin/quizzes/import
-// Accepts JSON { markdown: string } or multipart form-data with a .md file
+// Accepts JSON { markdown: string, overwrite?: boolean } or multipart form-data with a .md file
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
 
   try {
     let markdown = ''
+    let overwrite = false
     const contentType = req.headers.get('content-type') ?? ''
 
     if (contentType.includes('multipart/form-data')) {
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
     } else {
       const body = await req.json()
       markdown = body.markdown ?? ''
+      overwrite = body.overwrite === true
     }
 
     if (!markdown.trim()) {
@@ -37,6 +39,18 @@ export async function POST(req: NextRequest) {
     }
 
     const service = createServiceClient()
+
+    // If overwrite requested, delete the existing quiz with the same title first (cascade removes questions + options)
+    if (overwrite) {
+      const { data: existing } = await service
+        .from('quizzes')
+        .select('id')
+        .eq('title', parsed.title)
+        .maybeSingle()
+      if (existing) {
+        await service.from('quizzes').delete().eq('id', existing.id)
+      }
+    }
 
     // Insert quiz
     const { data: quiz, error: quizError } = await service
@@ -79,12 +93,10 @@ export async function POST(req: NextRequest) {
         .single()
 
       if (qError || !question) {
-        // Clean up the quiz we just created
         await service.from('quizzes').delete().eq('id', quiz.id)
         return NextResponse.json({ error: `Failed to insert question ${q.display_order}` }, { status: 500 })
       }
 
-      // Open text questions have no answer options
       if (q.answer_options.length > 0) {
         const { error: optError } = await service.from('answer_options').insert(
           q.answer_options.map(opt => ({
@@ -106,6 +118,7 @@ export async function POST(req: NextRequest) {
       quiz: { id: quiz.id, title: quiz.title },
       questionCount: parsed.questions.length,
       warnings: parsed.warnings,
+      replaced: overwrite,
     })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
