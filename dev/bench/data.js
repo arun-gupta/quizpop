@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779844058271,
+  "lastUpdate": 1779846951485,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -2429,6 +2429,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 3108,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "0885236eba94498a74e1426a331d5faccefb33b5",
+          "message": "Add poll question type\n\n- type: poll in markdown — all options use - [ ] (no correct answer)\n- Parser accepts type: poll, validates no [x] options present\n- Answer route awards full participation points to all poll voters\n- State route Block C skips correct-answer lookup for polls\n- HostResults: polls show all options at full brightness (no dim/highlight)\n- PlayerResults: shows 'Vote counted!' for poll questions\n- DB migration adds 'poll' to question_type CHECK constraint\n- Format guide updated with poll syntax\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T18:54:28-07:00",
+          "tree_id": "40799ec9e051be107c20464a9dc66eaf0963a21a",
+          "url": "https://github.com/arun-gupta/quizpop/commit/0885236eba94498a74e1426a331d5faccefb33b5"
+        },
+        "date": 1779846951131,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 2013,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 9048,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 2798,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 3307,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1419,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1744,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2173,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3042,
             "unit": "ms"
           }
         ]
