@@ -206,6 +206,22 @@ export default function HostGamePage() {
     callHostAction('next', { action: 'finish' })
   }, [hostToken, isActionPending]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleTogglePause = useCallback(async () => {
+    if (!hostToken || isActionPending) return
+    const action = session?.is_paused ? 'resume' : 'pause'
+    setIsActionPending(true)
+    try {
+      await fetch(`/api/game/${gameId}/pause`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hostToken, action }),
+      })
+      await fetchGameState()
+    } finally {
+      setIsActionPending(false)
+    }
+  }, [hostToken, isActionPending, session?.is_paused, gameId, fetchGameState])
+
   // -------- Render --------
 
   if (isLoading) {
@@ -268,6 +284,7 @@ export default function HostGamePage() {
           responses={respondedPlayerIds.size}
           questionStartedAt={session.question_started_at}
           wordCloud={wordCloud}
+          isPaused={session.is_paused}
         />
       )
       break
@@ -306,10 +323,28 @@ export default function HostGamePage() {
   }
 
   const canEndGame = session.game_state !== 'finished'
+  const canPause = !['lobby', 'finished'].includes(session.game_state)
 
   return (
     <>
       {content}
+
+      {/* Pause/Resume button — top-right, visible during live game states */}
+      {canPause && (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            onClick={handleTogglePause}
+            disabled={isActionPending}
+            className={`px-4 py-2 rounded-xl border text-sm font-bold backdrop-blur-sm transition-all duration-200 shadow-lg disabled:opacity-50 ${
+              session.is_paused
+                ? 'bg-emerald-700/90 hover:bg-emerald-600/90 border-emerald-400/60 text-white'
+                : 'bg-gray-900/80 hover:bg-yellow-900/80 border-white/20 hover:border-yellow-400/60 text-white/60 hover:text-white'
+            }`}
+          >
+            {session.is_paused ? '▶ Resume' : '⏸ Pause'}
+          </button>
+        </div>
+      )}
 
       {/* End Game overlay — visible in all non-finished states */}
       {canEndGame && (

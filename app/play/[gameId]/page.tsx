@@ -792,6 +792,16 @@ export default function PlayPage() {
 
   const gameState = session.game_state
 
+  if (session.is_paused) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col items-center justify-center gap-4">
+        <div className="text-8xl">⏸</div>
+        <h2 className="text-4xl font-extrabold text-white tracking-wide">Game Paused</h2>
+        <p className="text-white/50 text-lg">The host will resume shortly…</p>
+      </div>
+    )
+  }
+
   if (gameState === 'lobby') {
     return <PlayerLobby session={session} player={player} />
   }

@@ -21,7 +21,7 @@ export async function GET(
     const { data: session, error: sessionError } = await supabase
       .from('game_sessions')
       .select(
-        'id, quiz_id, join_code, game_state, current_question_index, question_started_at, section_intro_at, state_changed_at, correct_answer_id, started_at, completed_at, created_at'
+        'id, quiz_id, join_code, game_state, current_question_index, question_started_at, section_intro_at, state_changed_at, correct_answer_id, started_at, completed_at, created_at, is_paused, paused_at'
       )
       .eq('id', gameId)
       .single()
@@ -36,7 +36,7 @@ export async function GET(
     // see the updated state but (since timestamps are fresh) won't immediately fire again.
 
     // Block A: section_intro → question_active (5 s)
-    if (session.game_state === 'section_intro' && session.section_intro_at) {
+    if (session.game_state === 'section_intro' && session.section_intro_at && !session.is_paused) {
       const elapsed = Date.now() - new Date(session.section_intro_at).getTime()
       if (elapsed >= 5000) {
         const now = new Date().toISOString()
@@ -51,7 +51,7 @@ export async function GET(
     }
 
     // Block B: question_results → leaderboard (10 s)
-    if (session.game_state === 'question_results' && session.state_changed_at) {
+    if (session.game_state === 'question_results' && session.state_changed_at && !session.is_paused) {
       const elapsed = Date.now() - new Date(session.state_changed_at).getTime()
       if (elapsed >= 10000) {
         const now = new Date().toISOString()
@@ -152,7 +152,7 @@ export async function GET(
     }
 
     // Block C: question_active → question_results (when question timer expires)
-    if (session.game_state === 'question_active' && session.question_started_at && currentQuestion) {
+    if (session.game_state === 'question_active' && session.question_started_at && currentQuestion && !session.is_paused) {
       const elapsed = Date.now() - new Date(session.question_started_at).getTime()
       if (elapsed >= currentQuestion.timer_seconds * 1000) {
         const now = new Date().toISOString()
@@ -235,7 +235,7 @@ export async function GET(
     }
 
     // Block D: leaderboard → next question / section_intro / finished (8 s)
-    if (session.game_state === 'leaderboard' && session.state_changed_at && questions) {
+    if (session.game_state === 'leaderboard' && session.state_changed_at && questions && !session.is_paused) {
       const elapsed = Date.now() - new Date(session.state_changed_at).getTime()
       if (elapsed >= 8000) {
         const now = new Date().toISOString()

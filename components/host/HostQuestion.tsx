@@ -19,6 +19,7 @@ interface HostQuestionProps {
   responses: number
   questionStartedAt: string | null
   wordCloud?: WordCloudEntry[] | null
+  isPaused?: boolean
 }
 
 export default function HostQuestion({
@@ -27,6 +28,7 @@ export default function HostQuestion({
   responses,
   questionStartedAt,
   wordCloud,
+  isPaused = false,
 }: HostQuestionProps) {
   const [secondsLeft, setSecondsLeft] = useState(question.timer_seconds)
 
@@ -39,6 +41,7 @@ export default function HostQuestion({
       setSecondsLeft(question.timer_seconds)
       return
     }
+    if (isPaused) return // freeze timer while paused
 
     const tick = () => {
       const elapsed = (Date.now() - new Date(questionStartedAt).getTime()) / 1000
@@ -49,10 +52,19 @@ export default function HostQuestion({
     tick()
     const interval = setInterval(tick, 250)
     return () => clearInterval(interval)
-  }, [questionStartedAt, question.timer_seconds])
+  }, [questionStartedAt, question.timer_seconds, isPaused])
 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">
+      {/* Paused overlay */}
+      {isPaused && (
+        <div className="absolute inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-none">
+          <div className="text-center">
+            <div className="text-8xl mb-4">⏸</div>
+            <p className="text-white text-4xl font-extrabold tracking-widest uppercase">Game Paused</p>
+          </div>
+        </div>
+      )}
       {/* Top bar */}
       <div className="flex items-center justify-between px-8 pt-6 pb-2">
         <div className="text-white/60 text-xl font-semibold">

@@ -51,6 +51,8 @@ export interface GameSession {
   started_at: string | null
   completed_at: string | null
   created_at: string
+  is_paused: boolean
+  paused_at: string | null
 }
 
 export interface Player {
