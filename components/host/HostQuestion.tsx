@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import { PublicQuestion, Player, WordCloudEntry } from '@/types/database'
 import CountdownTimer from '@/components/game/CountdownTimer'
 import WordCloud from '@/components/game/WordCloud'
@@ -101,15 +100,13 @@ export default function HostQuestion({
 
         {/* Image — only shown before reveal */}
         {question.image_url && question.image_reveal !== 'after' && (
-          <div className="flex justify-center flex-shrink-0">
-            <div className="relative w-full max-w-lg rounded-2xl overflow-hidden shadow-xl" style={{height: 'clamp(80px, 15vh, 160px)'}}>
-              <Image
-                src={question.image_url}
-                alt="Question image"
-                fill
-                className="object-cover"
-              />
-            </div>
+          <div className="flex justify-center flex-shrink-0 px-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={question.image_url}
+              alt="Question image"
+              className="max-h-[28vh] w-auto max-w-full rounded-2xl shadow-xl object-contain"
+            />
           </div>
         )}
 
