@@ -18,6 +18,7 @@ interface HostResultsProps {
   answerDistribution: Record<string, number>
   wordCloud?: WordCloudEntry[] | null
   autoAdvanceSecs?: number
+  respondedCount?: number
 }
 
 export default function HostResults({
@@ -27,6 +28,7 @@ export default function HostResults({
   answerDistribution,
   wordCloud,
   autoAdvanceSecs = 5,
+  respondedCount,
 }: HostResultsProps) {
   const [countdown, setCountdown] = useState(autoAdvanceSecs)
 
@@ -40,9 +42,11 @@ export default function HostResults({
 
   const isOpenText = question.question_type === 'open_text'
   const isPoll = question.question_type === 'poll'
-  const totalResponses = isOpenText
-    ? (wordCloud ?? []).reduce((sum, e) => sum + e.count, 0)
-    : Object.values(answerDistribution).reduce((sum, n) => sum + n, 0)
+  // Use respondedCount (distinct players) when provided; fall back to summing distribution
+  const totalResponses = respondedCount ??
+    (isOpenText
+      ? (wordCloud ?? []).reduce((sum, e) => sum + e.count, 0)
+      : Object.values(answerDistribution).reduce((sum, n) => sum + n, 0))
 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col font-[var(--font-nunito)]">

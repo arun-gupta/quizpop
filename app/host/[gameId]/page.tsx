@@ -298,6 +298,7 @@ export default function HostGamePage() {
           answerDistribution={answerDistribution}
           wordCloud={wordCloud}
           autoAdvanceSecs={10}
+          respondedCount={respondedPlayerIds.size}
         />
       )
       break
