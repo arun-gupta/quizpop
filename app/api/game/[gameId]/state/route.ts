@@ -158,7 +158,7 @@ export async function GET(
         const now = new Date().toISOString()
         let correctAnswerId: string | null = null
 
-        if (currentQuestion.question_type !== 'open_text') {
+        if (currentQuestion.question_type === 'multiple_choice') {
           const { data: correctOption } = await supabase
             .from('answer_options')
             .select('id')
@@ -167,6 +167,7 @@ export async function GET(
             .single()
           correctAnswerId = correctOption?.id ?? null
         }
+        // polls and open_text have no correct_answer_id
 
         await supabase
           .from('game_sessions')

@@ -1,6 +1,6 @@
 export type GameState = 'lobby' | 'question_active' | 'question_results' | 'leaderboard' | 'section_intro' | 'finished'
 
-export type QuestionType = 'multiple_choice' | 'open_text'
+export type QuestionType = 'multiple_choice' | 'open_text' | 'poll'
 
 export interface WordCloudEntry {
   text: string

@@ -40,6 +40,7 @@ export default function HostResults({
   }, [autoAdvanceSecs])
 
   const isOpenText = question.question_type === 'open_text'
+  const isPoll = question.question_type === 'poll'
   const totalResponses = isOpenText
     ? (wordCloud ?? []).reduce((sum, e) => sum + e.count, 0)
     : Object.values(answerDistribution).reduce((sum, n) => sum + n, 0)
@@ -77,40 +78,42 @@ export default function HostResults({
           <div className="grid grid-cols-2 gap-4">
             {[...question.answer_options].map((option, i) => {
                 const config = ANSWER_CONFIG[i % 4]
-                const isCorrect = option.id === correctAnswerId
+                const isCorrect = !isPoll && option.id === correctAnswerId
                 const count = answerDistribution[option.id] ?? 0
                 const maxCount = Math.max(1, ...Object.values(answerDistribution))
                 const percentage = totalResponses > 0 ? (count / totalResponses) * 100 : 0
                 const barWidth = maxCount > 0 ? (count / maxCount) * 100 : 0
+                // Polls: all options full brightness; MC: dim non-correct options
+                const dimmed = !isPoll && correctAnswerId !== null && !isCorrect
 
                 return (
                   <div
                     key={option.id}
                     className={[
                       'rounded-2xl overflow-hidden shadow-xl transition-all duration-300',
-                      isCorrect ? '' : 'opacity-60',
+                      dimmed ? 'opacity-60' : '',
                     ].join(' ')}
                   >
                     <div
                       className={[
                         'flex items-center gap-4 px-4 py-4',
-                        isCorrect ? config.bg : config.dimBg,
+                        isCorrect ? config.bg : dimmed ? config.dimBg : config.bg,
                       ].join(' ')}
                     >
                       <span className="text-white text-3xl w-10 text-center flex-shrink-0">
                         {isCorrect ? '✓' : config.emoji}
                       </span>
-                      <span className={['text-xl font-bold leading-snug flex-1', isCorrect ? 'text-white' : 'text-white/70'].join(' ')}>
+                      <span className={['text-xl font-bold leading-snug flex-1', dimmed ? 'text-white/70' : 'text-white'].join(' ')}>
                         {option.answer_text}
                       </span>
-                      <span className={['text-xl font-extrabold ml-auto flex-shrink-0', isCorrect ? 'text-white' : 'text-white/60'].join(' ')}>
+                      <span className={['text-xl font-extrabold ml-auto flex-shrink-0', dimmed ? 'text-white/60' : 'text-white'].join(' ')}>
                         {count}
                       </span>
                     </div>
                     <div className="bg-black/30 px-4 py-2">
                       <div className="relative h-4 bg-white/10 rounded-full overflow-hidden">
                         <div
-                          className={['absolute left-0 top-0 h-full rounded-full transition-all duration-700', isCorrect ? config.bg : 'bg-white/30'].join(' ')}
+                          className={['absolute left-0 top-0 h-full rounded-full transition-all duration-700', dimmed ? 'bg-white/30' : config.bg].join(' ')}
                           style={{ width: `${barWidth}%` }}
                         />
                       </div>

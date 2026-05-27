@@ -14,7 +14,7 @@ export interface ParsedQuestion {
   timer_seconds: number
   points: number
   display_order: number
-  question_type: 'multiple_choice' | 'open_text'
+  question_type: 'multiple_choice' | 'open_text' | 'poll'
   section_title?: string
   answer_options: ParsedAnswerOption[]
 }
@@ -123,12 +123,12 @@ export function parseQuizMarkdown(input: string): ParsedQuiz {
       const pointsMatch = meta.match(/points:\s*(\d+)/i)
       const imageMatch = meta.match(/image:\s*(\S+)/i)
       const revealMatch = meta.match(/reveal:\s*(before|after)/i)
-      const typeMatch = meta.match(/type:\s*(open_text|multiple_choice)/i)
+      const typeMatch = meta.match(/type:\s*(open_text|multiple_choice|poll)/i)
       if (timerMatch) currentQuestion.timer_seconds = parseInt(timerMatch[1], 10)
       if (pointsMatch) currentQuestion.points = parseInt(pointsMatch[1], 10)
       if (imageMatch) currentQuestion.image_url = imageMatch[1].trim()
       if (revealMatch) currentQuestion.image_reveal = revealMatch[1].toLowerCase() as 'before' | 'after'
-      if (typeMatch) currentQuestion.question_type = typeMatch[1].toLowerCase() as 'multiple_choice' | 'open_text'
+      if (typeMatch) currentQuestion.question_type = typeMatch[1].toLowerCase() as 'multiple_choice' | 'open_text' | 'poll'
       continue
     }
 
@@ -204,6 +204,14 @@ function validateQuestion(
     errors.push(`${label}: needs at least 2 answer options`)
   } else if (q.answer_options.length > 4) {
     errors.push(`${label}: maximum 4 answer options (got ${q.answer_options.length})`)
+  }
+
+  if (q.question_type === 'poll') {
+    const correctCount = q.answer_options.filter(a => a.is_correct).length
+    if (correctCount > 0) {
+      errors.push(`${label}: poll questions should not have a correct answer — use "- [ ]" for all options`)
+    }
+    return errors
   }
 
   const correctCount = q.answer_options.filter(a => a.is_correct).length

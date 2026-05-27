@@ -113,6 +113,43 @@ export async function POST(
         is_correct: true,
         awarded_points: awardedPoints,
       }
+    } else if (currentQuestion.question_type === 'poll') {
+      // Poll: everyone gets full participation points, no correct answer
+      const { data: existingResponse } = await supabase
+        .from('player_responses')
+        .select('id, awarded_points')
+        .eq('player_id', playerId)
+        .eq('question_id', currentQuestion.id)
+        .maybeSingle()
+
+      if (existingResponse) {
+        return NextResponse.json(
+          { error: 'Already voted.', isCorrect: true, awardedPoints: existingResponse.awarded_points, correctAnswerId: null },
+          { status: 409 }
+        )
+      }
+
+      const { data: answerOption, error: answerError } = await supabase
+        .from('answer_options')
+        .select('id, question_id')
+        .eq('id', answerId)
+        .eq('question_id', currentQuestion.id)
+        .single()
+
+      if (answerError || !answerOption) {
+        return NextResponse.json({ error: 'Answer option not found.' }, { status: 404 })
+      }
+
+      isCorrect = true
+      awardedPoints = currentQuestion.points
+      insertPayload = {
+        player_id: playerId,
+        question_id: currentQuestion.id,
+        selected_answer_id: answerId,
+        response_time_ms: responseTimeMs,
+        is_correct: true,
+        awarded_points: awardedPoints,
+      }
     } else {
       // Multiple choice: reject duplicate submissions
       const { data: existingResponse, error: dupeCheckError } = await supabase
@@ -231,7 +268,14 @@ export async function POST(
       playerCount > 0 &&
       responseCount >= playerCount
     ) {
-      {
+      if (currentQuestion.question_type === 'poll') {
+        // Poll: no correct answer, just transition to results
+        await supabase
+          .from('game_sessions')
+          .update({ game_state: 'question_results', correct_answer_id: null })
+          .eq('id', gameId)
+          .eq('game_state', 'question_active')
+      } else {
         // Multiple choice: reveal the correct answer
         const { data: correctOption } = await supabase
           .from('answer_options')

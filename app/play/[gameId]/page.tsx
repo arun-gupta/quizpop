@@ -282,20 +282,20 @@ function PlayerResults({ question, player, selectedAnswerId, selectedText, submi
   }, [])
 
   const isOpenText = question.question_type === 'open_text'
-  const isCorrect = !isOpenText && selectedAnswerId && correctAnswerId && selectedAnswerId === correctAnswerId
-  const correctOption = !isOpenText ? question.answer_options.find(o => o.id === correctAnswerId) : null
+  const isPoll = question.question_type === 'poll'
+  const isCorrect = !isOpenText && !isPoll && selectedAnswerId && correctAnswerId && selectedAnswerId === correctAnswerId
+  const correctOption = (!isOpenText && !isPoll) ? question.answer_options.find(o => o.id === correctAnswerId) : null
+
+  const resultIcon = isPoll ? '🗳️' : isOpenText ? '💬' : !selectedAnswerId ? '⏰' : isCorrect ? '🎉' : '😅'
+  const resultText = isPoll ? 'Vote counted!' : isOpenText ? 'Answered!' : !selectedAnswerId ? 'Too slow!' : isCorrect ? 'Correct!' : 'Wrong!'
+  const resultColor = isPoll ? 'text-blue-300' : isOpenText ? 'text-violet-300' : !selectedAnswerId ? 'text-yellow-400' : isCorrect ? 'text-emerald-400' : 'text-red-400'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-900 to-indigo-900 flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm text-center space-y-6 animate-bounce-in">
         {/* Result icon */}
-        <div className="text-8xl">
-          {isOpenText ? '💬' : !selectedAnswerId ? '⏰' : isCorrect ? '🎉' : '😅'}
-        </div>
-
-        <h2 className={`text-4xl font-black ${isOpenText ? 'text-violet-300' : !selectedAnswerId ? 'text-yellow-400' : isCorrect ? 'text-emerald-400' : 'text-red-400'}`}>
-          {isOpenText ? 'Answered!' : !selectedAnswerId ? 'Too slow!' : isCorrect ? 'Correct!' : 'Wrong!'}
-        </h2>
+        <div className="text-8xl">{resultIcon}</div>
+        <h2 className={`text-4xl font-black ${resultColor}`}>{resultText}</h2>
 
         {/* Reveal image shown on results (reveal: after) */}
         {question.image_url && question.image_reveal === 'after' && (
