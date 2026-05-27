@@ -40,16 +40,9 @@ export async function POST(req: NextRequest) {
 
     const service = createServiceClient()
 
-    // If overwrite requested, delete the existing quiz with the same title first (cascade removes questions + options)
+    // If overwrite requested, delete ALL quizzes with the same title (handles duplicates too)
     if (overwrite) {
-      const { data: existing } = await service
-        .from('quizzes')
-        .select('id')
-        .eq('title', parsed.title)
-        .maybeSingle()
-      if (existing) {
-        await service.from('quizzes').delete().eq('id', existing.id)
-      }
+      await service.from('quizzes').delete().eq('title', parsed.title)
     }
 
     // Insert quiz
