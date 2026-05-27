@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1779843358672,
+  "lastUpdate": 1779843778136,
   "repoUrl": "https://github.com/arun-gupta/quizpop",
   "entries": {
     "QuizPop API Latency": [
@@ -2301,6 +2301,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "answer_p95 (100 players)",
             "value": 2977,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "committer": {
+            "email": "arun.gupta@gmail.com",
+            "name": "Arun Gupta",
+            "username": "arun-gupta"
+          },
+          "distinct": true,
+          "id": "ea222c98c93a42af025286d528f7345777ddd9d6",
+          "message": "Add host pause/resume with server-side timer preservation\n\n- New /api/game/[gameId]/pause route: pause stores paused_at timestamp;\n  resume shifts question_started_at / state_changed_at / section_intro_at\n  forward by the pause duration so timers continue exactly where they stopped\n- State route skips all auto-transitions while is_paused = true\n- Host overlay: Pause button (top-right), turns green Resume when paused\n- HostQuestion: timer freezes + blurred overlay while paused\n- Player: full-screen \"Game Paused\" screen while is_paused\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>",
+          "timestamp": "2026-05-26T18:01:57-07:00",
+          "tree_id": "22fb9b0cfe5e7d236dc7efc31577f2ffd1894d20",
+          "url": "https://github.com/arun-gupta/quizpop/commit/ea222c98c93a42af025286d528f7345777ddd9d6"
+        },
+        "date": 1779843777815,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "join_p50 (50 players)",
+            "value": 1410,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (50 players)",
+            "value": 2028,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (50 players)",
+            "value": 1540,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (50 players)",
+            "value": 2237,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p50 (100 players)",
+            "value": 1451,
+            "unit": "ms"
+          },
+          {
+            "name": "join_p95 (100 players)",
+            "value": 1836,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p50 (100 players)",
+            "value": 2629,
+            "unit": "ms"
+          },
+          {
+            "name": "answer_p95 (100 players)",
+            "value": 3458,
             "unit": "ms"
           }
         ]
